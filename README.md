@@ -1,5 +1,7 @@
 # Vietnamese Poem Generator
-![Vietnam Reunification Day 30-4-1975](https://www.google.com/url?sa=i&url=https%3A%2F%2Ftime.com%2F3840657%2Fsaigon-fall-lessons%2F&psig=AOvVaw3RO_x59-UB3Nwcd8ySiSNy&ust=1681838577368000&source=images&cd=vfe&ved=0CBAQjRxqFwoTCKC_94m3sf4CFQAAAAAdAAAAABAo)
+| ![Vietnam Reunification Day 30-4-1975](https://github.com/tuanlda78202/nlps23/blob/main/assets/saigon.jpeg) | 
+|:--:| 
+| Vietnam Reunification Day 30-4-1975|
 
 This is the source code of the project "Vietnamese Poem Generator" of the course "Natural Language Processing" Summer 2023.
 
@@ -56,14 +58,21 @@ nlps23/
 
 <table style="margin-left:auto;margin-right:auto;font-size:1.4vw;padding:10px 10px;text-align:center;vertical-align:center;">
   <tr>
-    <td colspan="5" style="font-weight:bold;">Salient Object Detection</td>
+    <td colspan="5" style="font-weight:bold;">Traditional approach</td>
   </tr>
   <tr>
-    <td><a href="https://github.com/tuanlda78202/CVP/blob/main/configs/mobilenetv3/README.md">MobileNetV3</a> (ICCV'2019)</td>
-    <td><a href="https://github.com/tuanlda78202/CVP/blob/main/configs/u2net/README.md">U2Net</a> (PR'2020)</td>
-    <td><a href="https://github.com/tuanlda78202/CVP/blob/main/configs/bisenet/README.md">BiSeNet</a> (CVPR'2021)</td>
-    <td><a href="https://github.com/tuanlda78202/CVP/blob/main/configs/dis/README.md">DIS</a> (ECCV'2022)</td>
-    <td><a href="https://github.com/tuanlda78202/CVP/blob/main/configs/inspyrenet/README.md">InSPyReNet</a> (ACCV'2022)</td>
+    <td><a href="https://github.com/tuanlda78202/nlps23/blob/main/configs/beam/README.md">Beam Search</a></td>
+    <td><a href="https://github.com/tuanlda78202/nlps23/blob/main/configs/hmm/README.md">HMM</a></td>
+  </tr>
+
+
+  <tr>
+    <td colspan="5" style="font-weight:bold;">Deep Learning approach</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/tuanlda78202/nlps23/blob/main/configs/spgpt2/README.md">SP-GPT2</a> (ICMLA'2021)</td>
+    <td><a href="https://github.com/tuanlda78202/nlps23/blob/main/configs/bartpho/README.md">BARTpho</a> (INTERSPEECH'2022)</td>
+    <td><a href="https://github.com/tuanlda78202/nlps23/blob/main/configs/ld4lg/README.md">LD4LG</a> (ACCV'2022)</td>
   </tr>
 
 </table>
