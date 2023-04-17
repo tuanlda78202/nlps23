@@ -1,10 +1,10 @@
-# Salient Object Detection for Korean Name Card
-![DIS-R](https://github.com/tuanlda78202/CVP/blob/main/assets/result-dis.png)
+# Vietnamese Poem Generator
+![Vietnam Reunification Day 30-4-1975](https://www.google.com/url?sa=i&url=https%3A%2F%2Ftime.com%2F3840657%2Fsaigon-fall-lessons%2F&psig=AOvVaw3RO_x59-UB3Nwcd8ySiSNy&ust=1681838577368000&source=images&cd=vfe&ved=0CBAQjRxqFwoTCKC_94m3sf4CFQAAAAAdAAAAABAo)
 
-This is the source code of the project "Salient Object Detection for Korean Name Card" of the course "Computer Vision" Summer 2023.
+This is the source code of the project "Vietnamese Poem Generator" of the course "Natural Language Processing" Summer 2023.
 
 ---
-- [Salient Object Detection for Korean Name Card](#salient-object-detection-for-korean-name-card)
+- [Vietnamese Poem Generator](#vietnamese-poem-generator)
   - [Abstract](#abstract)
   - [Folder Structure](#folder-structure)
   - [Model Zoo](#model-zoo)
@@ -16,15 +16,16 @@ This is the source code of the project "Salient Object Detection for Korean Name
     - [Inference](#inference)
   - [Contributors](#contributors)
 ## Abstract 
-Currently, existing image segmentation tasks mainly focus on segmenting objects with specific characteristics, e.g., salient, camouflaged, meticulous, or specific categories. Most of them have the same input/output formats, and barely use exclusive mechanisms designed for segmenting targets in their models, which means almost all tasks are dataset-dependent. Thus, it is very promising to formulate a category-agnostic DIS task for accurately segmenting objects with different structure complexities, regardless of their characteristics. Compared with semantic segmentation, the proposed DIS task usually focuses on images with single or a few targets, from which getting richer accurate details of each target is more feasible. 
+Vietnamese poetry has a rich history that dates back to the 10th century, with the emergence of the "Lục Bát" (six-eight) form, which is characterized by alternating lines of six and eight syllables. Since then, Vietnamese poetry has undergone various transformations and has been influenced by different cultural and historical periods, such as Chinese Confucianism, French colonialism, and modernization. Vietnamese poetry often includes themes of love, nature, patriotism, and social issues, and follows strict rules and structures, such as tonal patterns, rhyming schemes, and word choice.
 
-In this project, we will investigate the powerful of salient object detection in the real world by experimenting it over a various methods to see whether and how it works with Korean Name Card dataset.
+This project proposes a Vietnamese poem generator that utilizes a combination of state-of-the-art natural language processing techniques, including diffusion, transformer, GPT, and LLMs. The proposed model generates high-quality Vietnamese poems that adhere to the traditional rules and structures of Vietnamese poetry while also incorporating modern themes and language. The generator is based on a large corpus of Vietnamese poetry and uses the diffusion technique to enhance the coherence and fluency of the generated poems. The transformer-based architecture is used for encoding and decoding, while the GPT and LLMs techniques are employed for language modeling and improving the diversity of the generated poems. 
 
+The performance of the proposed model is evaluated through a set of quantitative and qualitative metrics, including perplexity, rhyme, and coherence. The experimental results demonstrate the effectiveness of the proposed model in generating high-quality Vietnamese poems that are both linguistically and aesthetically pleasing. The proposed model has potential applications in various fields, including literature, education, and art.
 
 ## Folder Structure
 
 ```
-cvps23/
+nlps23/
 ├── configs/ - training config
 |   ├── README.md - config name style
 │   ├── */README.md - abstract and experiment results model
