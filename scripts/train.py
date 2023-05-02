@@ -6,7 +6,7 @@ import argparse
 import collections
 import torch
 import numpy as np
-import dataloader.data_loaders as module_data
+import dataloader.dataloaders as module_data
 import model.loss as module_loss
 import model.metric as module_metric
 import model.arch as module_arch
@@ -33,10 +33,6 @@ def main(config):
     data_loader = config.init_obj("data_loader", module_data)
     valid_data_loader = data_loader.split_validation()
 
-    # Model architecture
-    if config
-    
-    
     model = config.init_obj("arch", module_arch)
     logger.info(model)
 

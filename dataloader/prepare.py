@@ -56,6 +56,3 @@ for split, dset in tokenized.items():
         arr[idx : idx + len(arr_batch)] = arr_batch
         idx += len(arr_batch)
     arr.flush()
-
-# Read the bin files later
-# m = np.memmap('train.bin', dtype=np.uint16, mode='r')
