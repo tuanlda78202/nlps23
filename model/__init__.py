@@ -1,2 +1,2 @@
-from .architecture import *
+from .arch import *
 from .metric import *
