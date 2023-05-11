@@ -12,31 +12,39 @@ import numpy as np
 import torch
 from contextlib import nullcontext
 from scripts import BaseTrainer
-from utils import inf_loop, MetricTracker
+from utils import 
 from tqdm import tqdm
 import wandb
+
+""" 
+{'name': 'VietnamesePoem-GPT2-124M', 'data': {'dataset': 'vietnamese-poem', 'gradient_accumulation_steps': '5 * 1', 
+'batch_size': 12, 'block_size': 1024}, 'arch': {'type': 'GPT2', 'args': {'n_layer': 12, 'n_head': 12, 'n_emb': 768, 
+'dropout': 0.0, 'bias': False}}, 'optimizer': {'type': 'LRDecay', 'args': {'decay_lr': True, 'warmup_iters': 2000, 
+'lr_decay_iters': 600000, 'min_lr': '6e-5'}}, 'eval': {'eval_interval': 2000, 'eval_iters': 200, 'log_interval': 10, 
+'eval_only': False, 'always_save_checkpoint': True, 'init_from': 'scratch'}, 'system': {'device': 'cuda', 'dtype': 'bfloat16', 
+'compile': True}, 'wandb': {'wandb_log': False, 'wandb_project': 'nlps23', 'wandb_run_name': 'vietnamese-poem_gpt2-124M'}}
+"""
 
 
 class GPT2Trainer(BaseTrainer):
     """
-    Trainer class
+    GPT2 Trainer class
     """
 
     def __init__(
         self,
         model,
-        criterion,
-        metric_ftns,
-        optimizer,
         config,
         device,
         data_loader,
         valid_data_loader=None,
-        lr_scheduler=None,
         len_epoch=None,
     ):
-        super().__init__(model, criterion, metric_ftns, optimizer, config, data_loader)
+        super().__init__(model, config, data_loader)
+
         self.config = config
+        self.data_config = self.config["data"]
+
         self.device = device
         self.ctx = (
             nullcontext()
@@ -48,6 +56,7 @@ class GPT2Trainer(BaseTrainer):
         if len_epoch is None:
             # epoch-based training
             self.len_epoch = len(self.data_loader)
+
         else:
             # iteration-based training
             self.data_loader = inf_loop(data_loader)
@@ -55,7 +64,6 @@ class GPT2Trainer(BaseTrainer):
 
         self.valid_data_loader = valid_data_loader
         self.do_validation = self.valid_data_loader is not None
-        self.lr_scheduler = lr_scheduler
         self.log_step = int(np.sqrt(data_loader.batch_size))
 
         # DataFrame metrics
@@ -66,8 +74,13 @@ class GPT2Trainer(BaseTrainer):
             "loss", *[m.__name__ for m in self.metric_ftns], track=self.track
         )
 
-        # GPT
-        tokens_per_iter = gradient_accumulation_steps * batch_size * block_size
+        # GPT2
+        tokens_per_iter = (
+            self.data_config["gradient_accumulation_steps"]
+            * self.data_config["batch_size"]
+            * self.data_config["block_size"]
+        )
+        print(f"Tokens per iteration will be: {tokens_per_iter:,}")
 
     def _train_epoch(self, epoch):
         """
@@ -83,17 +96,18 @@ class GPT2Trainer(BaseTrainer):
             total=len(self.data_loader),
             unit="it",
         )
+
         self.model.train()
         self.train_metrics.reset()
 
         # FWD&BWD update, with optional gradient accumulation to simulate larger batch size
         # and using the GradScaler if data type is float16
 
-        for micro_step in range(gradient_accumulation_steps):
+        for micro_step in range(self.data_config["gradient_accumulation_steps"]):
             with self.ctx:
-                logits, loss = model(X, Y)
+                logits, loss = self.model(X, Y)
                 loss = (
-                    loss / gradient_accumulation_steps
+                    loss / self.data_config["gradient_accumulation_steps"]
                 )  # scale the loss to account for gradient accumulation
 
             # immediately async prefetch next batch while model is doing the forward pass on the GPU
@@ -104,7 +118,7 @@ class GPT2Trainer(BaseTrainer):
         # Clip the gradient
         if grad_clip != 0.0:
             scaler.unscale_(optimizer)
-            torch.nn.utils.clip_grad_norm_(model.parameters(), grad_clip)
+            torch.nn.utils.clip_grad_norm_(self.model.parameters(), grad_clip)
 
         # Step the optimizer and scaler if training in fp16
         scaler.step(optimizer)

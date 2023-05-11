@@ -1,20 +1,23 @@
 import os
+import sys
+
+sys.path.append(os.getcwd())
 import logging
 from pathlib import Path
 from functools import reduce, partial
 from operator import getitem
 from datetime import datetime
-from logger import setup_logging
-from utils import load_yaml, write_yaml
+from utils.log import setup_logging
+from utils.util import load_yaml, write_yaml
 
 
 class ConfigParser:
     def __init__(self, config, resume=None, modification=None, run_id=None):
         """
-        class to parse configuration yaml file. Handles hyper-parameters for training, initializations of modules, checkpoint saving
+        Class to parse configuration yaml file. Handles hyper-parameters for training, initializations of modules, checkpoint saving
         and logging module.
 
-        :param config: Dict containing configurations, hyper-parameters for training. contents of `config.yaml` file for example.
+        :param config: Dict containing configurations, hyper-parameters for training
         :param resume: String, path to the checkpoint being loaded.
         :param modification: Dict key-chain:value, specifying position values to be replaced from config dict.
         :param run_id: Unique Identifier for training processes. Used to save checkpoints and training log. Timestamp is being used as default
@@ -30,6 +33,7 @@ class ConfigParser:
 
         if run_id is None:  # use timestamp as default run-id
             run_id = datetime.now().strftime(r"%m%d_%H%M%S")
+
         self._save_dir = save_dir / "models" / exp_name / run_id
         self._log_dir = save_dir / "log" / exp_name / run_id
 
@@ -141,7 +145,7 @@ class ConfigParser:
         return self._log_dir
 
 
-# helper functions to update config dict with custom cli options
+# Helper functions to update config dict with custom cli options
 def _update_config(config, modification):
     if modification is None:
         return config

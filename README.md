@@ -1,7 +1,7 @@
 # Vietnamese Poem Generator
-| ![Vietnam Reunification Day 30-4-1975](https://github.com/tuanlda78202/nlps23/blob/main/assets/saigon.jpeg) | 
-|:--:| 
-| Vietnam Reunification Day 30-4-1975|
+| ![Vietnam Reunification Day 30-4-1975](https://github.com/tuanlda78202/nlps23/blob/main/assets/saigon.jpeg) |
+| :---------------------------------------------------------------------------------------------------------: |
+|                                     Vietnam Reunification Day 30-4-1975                                     |
 
 This is the source code of the project "Vietnamese Poem Generator" of the course "Natural Language Processing" Summer 2023.
 
@@ -20,7 +20,7 @@ This is the source code of the project "Vietnamese Poem Generator" of the course
 ## Abstract 
 Vietnamese poetry has a rich history that dates back to the 10th century, with the emergence of the "Lục Bát" (six-eight) form, which is characterized by alternating lines of six and eight syllables. Since then, Vietnamese poetry has undergone various transformations and has been influenced by different cultural and historical periods, such as Chinese Confucianism, French colonialism, and modernization. Vietnamese poetry often includes themes of love, nature, patriotism, and social issues, and follows strict rules and structures, such as tonal patterns, rhyming schemes, and word choice.
 
-This project proposes a Vietnamese poem generator that utilizes a combination of state-of-the-art natural language processing techniques, including diffusion, transformer, GPT, and LLMs. The proposed model generates high-quality Vietnamese poems that adhere to the traditional rules and structures of Vietnamese poetry while also incorporating modern themes and language. The generator is based on a large corpus of Vietnamese poetry and uses the diffusion technique to enhance the coherence and fluency of the generated poems. The transformer-based architecture is used for encoding and decoding, while the GPT and LLMs techniques are employed for language modeling and improving the diversity of the generated poems. 
+This project proposes a Vietnamese poem generator that utilizes a combination of state-of-the-art natural language processing techniques, including diffusion, transformer, GPT2, and LLMs. The proposed model generates high-quality Vietnamese poems that adhere to the traditional rules and structures of Vietnamese poetry while also incorporating modern themes and language. The generator is based on a large corpus of Vietnamese poetry and uses the diffusion technique to enhance the coherence and fluency of the generated poems. The transformer-based architecture is used for encoding and decoding, while the GPT2 and LLMs techniques are employed for language modeling and improving the diversity of the generated poems. 
 
 The performance of the proposed model is evaluated through a set of quantitative and qualitative metrics, including perplexity, rhyme, and coherence. The experimental results demonstrate the effectiveness of the proposed model in generating high-quality Vietnamese poems that are both linguistically and aesthetically pleasing. The proposed model has potential applications in various fields, including literature, education, and art.
 

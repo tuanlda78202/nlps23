@@ -10,11 +10,9 @@ import collections
 import torch
 import numpy as np
 import dataloader.dataloaders as module_data
-import model.loss as module_loss
-import model.metric as module_metric
-import model.arch as module_arch
+import model as module_arch
 from configs.parse_config import ConfigParser
-from trainer import Trainer
+from trainer import GPT2Trainer
 
 
 SEED = 42
@@ -25,52 +23,35 @@ torch.backends.cuda.matmul.allow_tf32 = True
 
 
 def main(config):
-    # Logging
     logger = config.get_logger("train")
 
-    # Data Loader
     data_loader = config.init_obj("data_loader", module_data)
     valid_data_loader = data_loader.split_validation()
 
     model = config.init_obj("arch", module_arch)
     logger.info(model)
 
-    # Device GPU training
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = model.to(device)
 
-    # Loss & Metrics
-    criterion = getattr(module_loss, config["loss"])
-    metrics = [getattr(module_metric, met) for met in config["metrics"]]
-
-    # Optimizer & LR scheduler
-    trainable_params = filter(lambda p: p.requires_grad, model.parameters())
-    optimizer = config.init_obj("optimizer", torch.optim, trainable_params)
-    lr_scheduler = config.init_obj("lr_scheduler", torch.optim.lr_scheduler, optimizer)
-
-    # Loop
-    trainer = Trainer(
+    trainer = GPT2Trainer(
         model,
-        criterion,
-        metrics,
-        optimizer,
         config=config,
         device=device,
         data_loader=data_loader,
         valid_data_loader=valid_data_loader,
-        lr_scheduler=lr_scheduler,
     )
 
     trainer.train()
 
 
 if __name__ == "__main__":
-    args = argparse.ArgumentParser(description="Salient Object Detection")
+    args = argparse.ArgumentParser(description="Vietnamese Poem Generator")
 
     args.add_argument(
         "-c",
         "--config",
-        default="configs/u2net/u2net-lite_scratch_1xb4-1k_knc-320x320.yaml",
+        default="configs/gpt2/train_gpt2.yaml",
         type=str,
         help="config file path (default: None)",
     )

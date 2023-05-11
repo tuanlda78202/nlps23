@@ -23,21 +23,14 @@ class BaseTrainer:
     def __init__(
         self,
         model,
-        criterion,
-        metric_ftns,
-        optimizer,
         config,
         data_loader,
-        lr_scheduler=None,
         len_epoch=None,
     ):
         self.config = config
         self.logger = config.get_logger("trainer", config["trainer"]["verbosity"])
 
         self.model = model
-        self.criterion = criterion
-        self.metric_ftns = metric_ftns
-        self.optimizer = optimizer
 
         cfg_trainer = config["trainer"]
         self.epochs = cfg_trainer["epochs"]
@@ -95,7 +88,7 @@ class BaseTrainer:
             # determine the vocab size we'll use for from-scratch training
             if meta_vocab_size is None:
                 print(
-                    "defaulting to vocab_size of GPT-2 to 50304 (50257 rounded up for efficiency)"
+                    "defaulting to vocab_size of GPT2-2 to 50304 (50257 rounded up for efficiency)"
                 )
 
             model_args["vocab_size"] = (
@@ -103,7 +96,7 @@ class BaseTrainer:
             )
 
             gptconf = GPTConfig(**model_args)
-            model = GPT(gptconf)
+            model = GPT2(gptconf)
 
     @abstractmethod
     def _train_epoch(self, epoch):

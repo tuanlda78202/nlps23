@@ -6,7 +6,7 @@ from contextlib import nullcontext
 import numpy as np
 import time
 import torch
-from model import GPTConfig, GPT
+from model import GPTConfig, GPT2
 
 # -----------------------------------------------------------------------------
 batch_size = 12
@@ -77,7 +77,7 @@ gptconf = GPTConfig(
     dropout=0,  # for determinism
     bias=bias,
 )
-model = GPT(gptconf)
+model = GPT2(gptconf)
 model.to(device)
 
 optimizer = model.configure_optimizers(

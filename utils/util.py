@@ -1,6 +1,20 @@
-# LR decay scheduler (cosine with warmup)
 import math
 import torch
+import yaml
+from pathlib import Path
+
+
+def load_yaml(fname):
+    fname = Path(fname)
+    with fname.open("rt") as file:
+        config = yaml.safe_load(file)
+    return config
+
+
+def write_yaml(content, fname):
+    fname = Path(fname)
+    with fname.open("wt") as handle:
+        yaml.dump(content, handle, indent=4, sort_keys=False)
 
 
 def get_lr(it, learning_rate, warmup_iters, lr_decay_iters, min_lr):
