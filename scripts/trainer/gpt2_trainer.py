@@ -1,5 +1,5 @@
 # ENV
-import sys, os, logging
+import os, logging
 
 os.environ["WANDB_SILENT"] = "True"
 os.environ["WANDB_MODE"] = "offline"
@@ -11,13 +11,10 @@ logger.setLevel(logging.WARNING)
 import numpy as np
 import torch
 from contextlib import nullcontext
-from torchvision.utils import make_grid
-from base import BaseTrainer
-from model.metric import mae, sm
+from scripts import BaseTrainer
 from utils import inf_loop, MetricTracker
 from tqdm import tqdm
 import wandb
-import gc
 
 
 class GPT2Trainer(BaseTrainer):
@@ -185,7 +182,7 @@ class GPT2Trainer(BaseTrainer):
 
         log = self.train_metrics.result()
 
-        if self.do_validation:
+        if iter_num % eval_interval == 0 and self.do_validation:
             val_log = self._valid_epoch(epoch)
             log.update(**{"val_" + k: v for k, v in val_log.items()})
 
@@ -204,22 +201,53 @@ class GPT2Trainer(BaseTrainer):
         self.model.eval()
         self.valid_metrics.reset()
 
-        @torch.no_grad()
-        def estimate_loss():
-            out = {}
-            model.eval()
+        lr = get_lr(iter_num) if decay_lr else learning_rate
+        for param_group in optimizer.param_groups:
+            param_group["lr"] = lr
+
+        with torch.no_grad():
+            losses = {}
+
             for split in ["train", "val"]:
                 losses = torch.zeros(eval_iters)
+
                 for k in range(eval_iters):
                     X, Y = get_batch(split)
                     with ctx:
                         logits, loss = model(X, Y)
                     losses[k] = loss.item()
-                out[split] = losses.mean()
-            model.train()
-            return out
 
-        with torch.no_grad():
+                losses[split] = losses.mean()
+
+            print(
+                f"step {iter_num}: train loss {losses['train']:.4f}, val loss {losses['val']:.4f}"
+            )
+
+            wandb.log(
+                {
+                    "iter": iter_num,
+                    "train/loss": losses["train"],
+                    "val/loss": losses["val"],
+                    "lr": lr,
+                    "mfu": running_mfu * 100,  # convert to percentage
+                }
+            )
+
+        if iter_num % log_interval == 0 and master_process:
+            # get loss as float. note: this is a CPU-GPU sync point
+            # scale up to undo the division above, approximating the true total loss (exact would have been a sum)
+            lossf = loss.item() * gradient_accumulation_steps
+            if local_iter_num >= 5:  # let the training loop settle a bit
+                mfu = raw_model.estimate_mfu(
+                    batch_size * gradient_accumulation_steps, dt
+                )
+                running_mfu = (
+                    mfu if running_mfu == -1.0 else 0.9 * running_mfu + 0.1 * mfu
+                )
+            print(
+                f"iter {iter_num}: loss {lossf:.4f}, time {dt*1000:.2f}ms, mfu {running_mfu*100:.2f}%"
+            )
+
             for batch_idx, loader in enumerate(self.valid_data_loader):
                 # Load to Device
                 if self.device == "cuda":

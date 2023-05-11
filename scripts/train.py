@@ -1,4 +1,5 @@
-import sys, os
+import sys
+import os
 import warnings
 
 sys.path.append(os.getcwd())
@@ -90,7 +91,6 @@ if __name__ == "__main__":
         help="indices of GPUs to enable (default: all)",
     )
 
-    # Custom CLI options to modify configuration from default values given in yaml file.
     CustomArgs = collections.namedtuple("CustomArgs", "flags type target")
 
     options = [
