@@ -15,6 +15,7 @@ def get_lr(it, learning_rate, warmup_iters, lr_decay_iters, min_lr):
     decay_ratio = (it - warmup_iters) / (lr_decay_iters - warmup_iters)
     assert 0 <= decay_ratio <= 1
 
-    coef = 0.5 * (1.0 + math.cos(math.pi * decay_ratio))  # coef ranges 0..1
+    # Coef ranges [0,1]
+    coef = 0.5 * (1.0 + math.cos(math.pi * decay_ratio))
 
     return min_lr + coef * (learning_rate - min_lr)

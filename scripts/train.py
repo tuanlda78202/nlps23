@@ -35,7 +35,7 @@ def main(config):
     logger.info(model)
 
     # Device GPU training
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = model.to(device)
 
     # Loss & Metrics
