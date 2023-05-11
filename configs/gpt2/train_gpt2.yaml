@@ -1,25 +1,24 @@
-# I/O
-out_dir = 'out'
+
+name: VietnamesePoem-GPT2-124M
 
 # Data
-
-data:
-
-
 dataset = 'vietnamese-poem'
 gradient_accumulation_steps = 5 * 8 # used to simulate larger batch sizes
 batch_size = 12 # if gradient_accumulation_steps > 1, this is the micro-batch size
 block_size = 1024
 
 # Model
-n_layer = 12
-n_head = 12
-n_embd = 768
-dropout = 0.0 # for pretraining 0 is good, for finetuning try 0.1+
-bias = False # do we use bias inside LayerNorm and Linear layers?
+arch: 
+  type: GPT
+  args:
+    n_layer = 12
+    n_head = 12
+    n_emb = 768
+    dropout = 0.0 # for pretraining 0 is good, for finetuning try 0.1+
+    bias = False # do we use bias inside LayerNorm and Linear layers?
 
 optimizer:
-  type: Adam
+  type: AdamW
 
   args: 
     learning_rate = 6e-4 # max learning rate
@@ -30,19 +29,13 @@ optimizer:
     grad_clip = 1.0 # clip gradients at this value, or disable if == 0.0
 
 # LR decay
-
-lrd:
-  
 decay_lr = True # whether to decay the learning rate
 warmup_iters = 2000 # how many steps to warm up for
 lr_decay_iters = 600000 # should be ~= max_iters per Chinchilla
 min_lr = 6e-5 # minimum learning rate, should be ~= learning_rate/10 per Chinchilla
 
-# DDP settings
-backend = 'nccl' # 'nccl', 'gloo', etc.
-
 # System
-device = 'cuda' # examples: 'cpu', 'cuda', 'cuda:0', 'cuda:1' etc., or try 'mps' on macbooks
+device = 'cuda' 
 dtype = 'bfloat16' # 'float32', 'bfloat16', or 'float16', the latter will auto implement a GradScaler
 compile = True # use PyTorch 2.0 to compile the model to be faster
 

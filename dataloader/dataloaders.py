@@ -1,6 +1,7 @@
 from __future__ import print_function, division
 import numpy as np
-from torch.utils.data import Dataset
+import torch
+from torch.utils.data import Dataset, DataLoader
 from datasets import load_dataset
 from transformers import PreTrainedTokenizerBase
 
@@ -8,9 +9,11 @@ from transformers import PreTrainedTokenizerBase
 class VNPDataset(Dataset):
     def __init__(self, dataset_name="Libosa2707/vietnamese-poem"):
         self.raw_dataset = load_dataset(dataset_name)
+
         self.dataset = self.raw_dataset["train"].train_test_split(
             test_size=0.1, seed=42, shuffle=True
         )
+
         self.dataset["val"] = self.dataset.pop("test")
 
     def __len__(self):
@@ -33,30 +36,52 @@ class VNPDataset(Dataset):
 
             return {"text": text, "genre": example["genre"]}
 
-        tokenized = self.dataset.map(
+        token = self.dataset.map(
             process,
             remove_columns=["id", "content", "title", "url", "genre"],
-            num_proc=2,
+            num_proc=4,
         )
 
-        return tokenized
-
-    def concat_bin(self):
-        """
-        Concatenate all the ids in each dataset into one large file
-
-        Read the bin files later:
-        m = np.memmap('train.bin', dtype=np.uint16, mode='r')
-        """
-        pass
+        return token
 
 
 class VNPDataLoader(DataLoader):
     """Vietnamese-Poem Data Loader"""
 
-    def __init__(self, dataset=None, shuffle=True, batch_size=4, block_size=4):
-        self.dataset = VNPDataset()
+    def __init__(
+        self, dataset=None, shuffle=True, batch_size=8, block_size=8, device="cpu"
+    ):
+        self.dataset = VNPDataset().tokenized()
         self.batch_size = batch_size
         self.block_size = block_size
+        self.device = device
 
         super().__init__(self.dataset)
+
+    def get_batch(self, split):
+        data = self.dataset["train"] if split == "train" else self.dataset["val"]
+
+        idx = torch.randint(len(data) - self.block_size, (self.batch_size,))
+
+        input = torch.stack(
+            [
+                torch.from_numpy((data[i : i + self.block_size]).astype(np.int64))
+                for i in idx
+            ]
+        )
+
+        label = torch.stack(
+            [
+                torch.from_numpy(
+                    (data[i + 1 : i + 1 + self.block_size]).astype(np.int64)
+                )
+                for i in idx
+            ]
+        )
+
+        if self.device == "cuda":
+            # pin arrays x,y, which allows us to move them to GPU asynchronously (non_blocking=True)
+            input = input.pin_memory().to(self.device, non_blocking=True)
+            label = label.pin_memory().to(self.device, non_blocking=True)
+
+        return input, label

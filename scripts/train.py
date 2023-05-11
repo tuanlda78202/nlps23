@@ -1,6 +1,8 @@
 import sys, os
+import warnings
 
 sys.path.append(os.getcwd())
+warnings.filterwarnings("ignore")
 
 import argparse
 import collections
@@ -13,16 +15,12 @@ import model.arch as module_arch
 from configs.parse_config import ConfigParser
 from trainer import Trainer
 
-import warnings
 
-warnings.filterwarnings("ignore")
-
-# fix random seeds for reproducibility
 SEED = 42
-torch.manual_seed(SEED)
-torch.backends.cudnn.deterministic = True
-torch.backends.cudnn.benchmark = False
 np.random.seed(SEED)
+torch.manual_seed(SEED)
+torch.backends.cudnn.benchmark = True
+torch.backends.cuda.matmul.allow_tf32 = True
 
 
 def main(config):
@@ -37,13 +35,7 @@ def main(config):
     logger.info(model)
 
     # Device GPU training
-    device = (
-        "mps"
-        if torch.backends.mps.is_available()
-        else ("cuda:0" if torch.cuda.is_available() else "cpu")
-    )
-    # CPU
-    device = "cpu"
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     model = model.to(device)
 
     # Loss & Metrics

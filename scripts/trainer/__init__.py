@@ -1,1 +1,1 @@
-from .gpt_trainer import *
+from .gpt2_trainer import *
