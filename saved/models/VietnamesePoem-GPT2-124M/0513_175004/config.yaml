@@ -1,0 +1,45 @@
+name: VietnamesePoem-GPT2-124M
+dataloader:
+    type: VNPDataLoader
+    args:
+        batch_size: 10
+        block_size: 1024
+        device: cuda
+    gradient_accumulation_steps: 5 * 1
+    dtype: bfloat16
+    compile: true
+arch:
+    type: GPT2
+    args:
+        block_size: 1024
+        vocab_size: 50304
+        n_layer: 12
+        n_head: 12
+        n_emb: 768
+        dropout: 0.0
+        bias: false
+optimizer:
+    type: LRDecay
+    args:
+        decay_lr: true
+        warmup_iters: 2000
+        lr_decay_iters: 600000
+        min_lr: 6e-5
+eval:
+    eval_interval: 2000
+    eval_iters: 200
+    log_interval: 10
+    eval_only: false
+    always_save_checkpoint: true
+    init_from: scratch
+trainer:
+    type: Trainer
+    compile: true
+    epochs: 1000
+    save_dir: saved/
+    save_period: 10
+    verbosity: 1
+    visual_tool: wandb
+    project: nlps23
+    api_key_file: ./configs/api-key/tuanlda78202
+    entity: tuanlda78202

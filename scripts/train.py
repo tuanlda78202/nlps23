@@ -9,7 +9,7 @@ import argparse
 import collections
 import torch
 import numpy as np
-import trainer.dataloaders as module_data
+import trainer.dataloader as module_data
 import model as module_arch
 from configs.parse_config import ConfigParser
 from trainer import GPT2Trainer
@@ -25,8 +25,10 @@ torch.backends.cuda.matmul.allow_tf32 = True
 def main(config):
     logger = config.get_logger("train")
 
-    data_loader = config.init_obj("data_loader", module_data)
-    valid_data_loader = data_loader.split_validation()
+    data_loader = config.init_obj("dataloader", module_data)
+    print(data_loader.__dict__)
+    train_dataloader = data_loader.get_batch(split="train")
+    valid_dataloader = data_loader.get_batch(split="val")
 
     model = config.init_obj("arch", module_arch)
     logger.info(model)
@@ -38,8 +40,8 @@ def main(config):
         model,
         config=config,
         device=device,
-        data_loader=data_loader,
-        valid_data_loader=valid_data_loader,
+        data_loader=train_dataloader,
+        valid_data_loader=valid_dataloader,
     )
 
     trainer.train()

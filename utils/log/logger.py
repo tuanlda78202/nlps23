@@ -5,7 +5,7 @@ from utils.util import load_yaml
 
 
 def setup_logging(
-    save_dir, log_config="logger/logger_config.yaml", default_level=logging.INFO
+    save_dir, log_config="utils/log/logger_config.yaml", default_level=logging.INFO
 ):
     """
     Setup logging configuration

@@ -20,7 +20,7 @@ class ConfigParser:
         :param run_id: Unique Identifier for training processes. Used to save checkpoints and training log. Timestamp is being used as default
         """
 
-        # load config file and apply modification
+        # Load config file and apply modification
         self._config = _update_config(config, modification)
         self.resume = resume
 
@@ -29,8 +29,7 @@ class ConfigParser:
 
         exp_name = self.config["name"]
 
-        if run_id is None:  # use timestamp as default run-id
-            run_id = datetime.now().strftime(r"%m%d_%H%M%S")
+        run_id = datetime.now().strftime(r"%m%d_%H%M%S")
 
         self._save_dir = save_dir / "models" / exp_name / run_id
         self._log_dir = save_dir / "log" / exp_name / run_id
@@ -73,7 +72,6 @@ class ConfigParser:
         config = load_yaml(cfg_fname)
 
         if args.config and resume:
-            # update new config for fine-tuning
             config.update(load_yaml(args.config))
 
         # parse custom cli options into dictionary
@@ -91,12 +89,16 @@ class ConfigParser:
         is equivalent to
         `object = module.name(a, b=1)`
         """
+
         module_name = self[name]["type"]
         module_args = dict(self[name]["args"])
+
         assert all(
             [k not in module_args for k in kwargs]
         ), "Overwriting kwargs given in config file is not allowed"
+
         module_args.update(kwargs)
+
         return getattr(module, module_name)(*args, **module_args)
 
     def init_ftn(self, name, module, *args, **kwargs):
@@ -108,12 +110,16 @@ class ConfigParser:
         is equivalent to
         `function = lambda *args, **kwargs: module.name(a, *args, b=1, **kwargs)`.
         """
+
         module_name = self[name]["type"]
         module_args = dict(self[name]["args"])
+
         assert all(
             [k not in module_args for k in kwargs]
         ), "Overwriting kwargs given in config file is not allowed"
+
         module_args.update(kwargs)
+
         return partial(getattr(module, module_name), *args, **module_args)
 
     def __getitem__(self, name):
