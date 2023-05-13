@@ -1,9 +1,7 @@
 import argparse
 import torch
 from tqdm import tqdm
-import dataloader.dataloaders as module_data
-import model.loss as module_loss
-import model.metric as module_metric
+import trainer.dataloaders as module_data
 import model.model as module_arch
 from configs.parse_config import ConfigParser
 

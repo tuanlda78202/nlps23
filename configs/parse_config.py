@@ -1,14 +1,11 @@
 import os
-import sys
-
-sys.path.append(os.getcwd())
 import logging
 from pathlib import Path
 from functools import reduce, partial
 from operator import getitem
 from datetime import datetime
 from utils.log import setup_logging
-from utils.util import load_yaml, write_yaml
+from utils import load_yaml, write_yaml
 
 
 class ConfigParser:
@@ -22,6 +19,7 @@ class ConfigParser:
         :param modification: Dict key-chain:value, specifying position values to be replaced from config dict.
         :param run_id: Unique Identifier for training processes. Used to save checkpoints and training log. Timestamp is being used as default
         """
+
         # load config file and apply modification
         self._config = _update_config(config, modification)
         self.resume = resume

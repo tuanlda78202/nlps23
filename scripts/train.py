@@ -9,7 +9,7 @@ import argparse
 import collections
 import torch
 import numpy as np
-import dataloader.dataloaders as module_data
+import trainer.dataloaders as module_data
 import model as module_arch
 from configs.parse_config import ConfigParser
 from trainer import GPT2Trainer

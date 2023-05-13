@@ -1,9 +1,9 @@
-# ENV
 import os, logging
 
 os.environ["WANDB_SILENT"] = "True"
 os.environ["WANDB_MODE"] = "offline"
-os.makedirs("out", exist_ok=True)
+# os.makedirs("output", exist_ok=True)
+
 logger = logging.getLogger("wandb")
 logger.setLevel(logging.ERROR)
 logger.setLevel(logging.WARNING)
@@ -11,8 +11,7 @@ logger.setLevel(logging.WARNING)
 import numpy as np
 import torch
 from contextlib import nullcontext
-from scripts import BaseTrainer
-from utils import 
+from trainer.base_trainer import BaseTrainer
 from tqdm import tqdm
 import wandb
 
