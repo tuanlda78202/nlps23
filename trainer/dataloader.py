@@ -24,7 +24,7 @@ class VNPDataset(Dataset):
 
         self.dataset = self.process_poem(self.raw_dataset)
 
-        self.dataset = self.dataset.map(self.tokenization, batched=False, num_proc=4)
+        self.dataset = self.dataset.map(self.tokenization, batched=False, num_proc=6)
 
         self.dataset = self.dataset.remove_columns(["text", "token_type_ids"])
 
@@ -51,7 +51,7 @@ class VNPDataset(Dataset):
         processed = ds.map(
             process,
             remove_columns=["id", "content", "title", "url", "genre"],
-            num_proc=4,
+            num_proc=6,
         )
 
         return processed

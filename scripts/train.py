@@ -14,12 +14,6 @@ import model as module_arch
 from configs.parse_config import ConfigParser
 from trainer import GPT2Trainer
 
-from model import GPTConfig
-
-arch = {"n_layer": 12, "n_head": 12, "n_embd": 768, "dropout": 0.0, "bias": False}
-print(GPTConfig(**arch))
-
-
 SEED = 42
 np.random.seed(SEED)
 torch.manual_seed(SEED)
