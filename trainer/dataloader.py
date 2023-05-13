@@ -2,8 +2,12 @@ from __future__ import print_function, division
 import numpy as np
 import torch
 from torch.utils.data import Dataset, DataLoader
-from datasets import load_dataset
-from transformers import PreTrainedTokenizerBase
+from datasets import load_dataset, DatasetDict
+from transformers import (
+    PreTrainedTokenizerBase,
+    AutoTokenizer,
+    DataCollatorForLanguageModeling,
+)
 
 
 class VNPDataset(Dataset):
@@ -11,8 +15,15 @@ class VNPDataset(Dataset):
 
     def __init__(self, dataset_name="Libosa2707/vietnamese-poem"):
         self.raw_dataset = load_dataset(dataset_name)
+        self.tokenizer = AutoTokenizer.from_pretrained(
+            "vinai/bartpho-word", use_fast=True
+        )
 
-        self.raw_dataset = self.tokenized()
+        self.dataset = self.process_poem(self.raw_dataset)
+
+        self.dataset = self.dataset.map(self.tokenization, batched=False, num_proc=4)
+
+        self.dataset = self.dataset.remove_columns(["text", "token_type_ids"])
 
     def __len__(self):
         return len(self.raw_dataset)
@@ -24,7 +35,7 @@ class VNPDataset(Dataset):
 
         return {"idx": idx, "text": text, "genre": genre}
 
-    def tokenized(self):
+    def process_poem(self, ds):
         """Tokenize the dataset"""
 
         process = lambda example: {
@@ -34,13 +45,32 @@ class VNPDataset(Dataset):
             "genre": example["genre"],
         }
 
-        token = self.raw_dataset.map(
+        processed = ds.map(
             process,
             remove_columns=["id", "content", "title", "url", "genre"],
             num_proc=4,
         )
 
-        return token
+        return processed
+
+    def tokenization(self, example):
+        text = self.tokenizer.bos_token + example["text"] + self.tokenizer.eos_token
+
+        tokenized_text = self.tokenizer(
+            text,
+            padding="max_length",
+            truncation=True,
+            max_length=512,
+            return_tensors="pt",
+        )
+
+        tokenized_text["genre"] = example["genre"]
+
+        tokenized_text["input_ids"][
+            tokenized_text["input_ids"] == self.tokenizer.pad_token_id
+        ] = -100
+
+        return tokenized_text
 
 
 class VNPDataLoader(DataLoader):
@@ -50,61 +80,28 @@ class VNPDataLoader(DataLoader):
         self,
         dataset=None,
         batch_size=8,
-        block_size=8,
-        device="cpu",
-        num_workers=0,
+        num_workers=4,
         shuffle=False,
     ):
         # Dataset
-        self.dataset = VNPDataset()
-        split_dataset = self.dataset.raw_dataset["train"].train_test_split(
+        self.ds = VNPDataset()
+
+        self.data_collator = DataCollatorForLanguageModeling(
+            tokenizer=self.ds.tokenizer, mlm_probability=False
+        )
+
+        split_dataset = self.ds.dataset["train"].train_test_split(
             test_size=0.1, seed=42, shuffle=True
         )
 
-        self.val_dataset = split_dataset.pop("test")
-        self.train_dataset = split_dataset["train"]
-
-        # Hyper-parameters
-        self.batch_size = batch_size
-        self.block_size = block_size
-        self.device = device
-        self.num_workers = num_workers
-        self.shuffle = shuffle
-
-        self.sampler = self.get_batch(split="train")
-        self.valid_sampler = self.get_batch(split="val")
-
-        super().__init__(self.dataset, batch_size, device, num_workers, shuffle)
-
-    def get_batch(self, split):
-        data = self.train_dataset if split == "train" else self.val_dataset
-
-        idx = torch.randint(len(data) - self.block_size, (self.batch_size,))
-
-        input = torch.stack(
-            [
-                torch.from_numpy((data[i : i + self.block_size]).astype(np.int64))
-                for i in idx
-            ]
+        self.dataset = DatasetDict(
+            {"val": split_dataset["test"], "train": split_dataset["train"]}
         )
 
-        label = torch.stack(
-            [
-                torch.from_numpy(
-                    (data[i + 1 : i + 1 + self.block_size]).astype(np.int64)
-                )
-                for i in idx
-            ]
+        super().__init__(
+            self.dataset,
+            batch_size,
+            num_workers=num_workers,
+            shuffle=shuffle,
+            collate_fn=self.data_collator,
         )
-
-        if self.device == "cuda":
-            # pin arrays x,y, which allows us to move them to GPU asynchronously (non_blocking=True)
-            input = input.pin_memory().to(self.device, non_blocking=True)
-            label = label.pin_memory().to(self.device, non_blocking=True)
-
-        return (input, label)
-
-
-x = VNPDataLoader()
-y = torch.from_numpy((x.train_dataset[0 : 0 + 256]).astype(np.int64))
-print(y)
