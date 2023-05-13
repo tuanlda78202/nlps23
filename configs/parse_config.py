@@ -6,6 +6,7 @@ from operator import getitem
 from datetime import datetime
 from utils.log import setup_logging
 from utils import load_yaml, write_yaml
+from model import GPTConfig
 
 
 class ConfigParser:
@@ -98,6 +99,9 @@ class ConfigParser:
         ), "Overwriting kwargs given in config file is not allowed"
 
         module_args.update(kwargs)
+
+        if module_name == "GPT2":
+            return getattr(module, module_name)(GPTConfig(**module_args))
 
         return getattr(module, module_name)(*args, **module_args)
 

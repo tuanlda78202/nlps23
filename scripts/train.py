@@ -14,6 +14,11 @@ import model as module_arch
 from configs.parse_config import ConfigParser
 from trainer import GPT2Trainer
 
+from model import GPTConfig
+
+arch = {"n_layer": 12, "n_head": 12, "n_embd": 768, "dropout": 0.0, "bias": False}
+print(GPTConfig(**arch))
+
 
 SEED = 42
 np.random.seed(SEED)
@@ -26,9 +31,8 @@ def main(config):
     logger = config.get_logger("train")
 
     data_loader = config.init_obj("dataloader", module_data)
-    print(data_loader.__dict__)
-    train_dataloader = data_loader.get_batch(split="train")
-    valid_dataloader = data_loader.get_batch(split="val")
+    train_dataloader = data_loader.dataset["train"]
+    valid_dataloader = data_loader.dataset["val"]
 
     model = config.init_obj("arch", module_arch)
     logger.info(model)

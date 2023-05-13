@@ -1,8 +1,10 @@
 from __future__ import print_function, division
+from typing import Iterable, Optional, Sequence, Union
 import numpy as np
 import torch
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset, DataLoader, Sampler
 from datasets import load_dataset, DatasetDict
+from torch.utils.data.dataloader import _collate_fn_t, _worker_init_fn_t
 from transformers import (
     PreTrainedTokenizerBase,
     AutoTokenizer,
@@ -15,6 +17,7 @@ class VNPDataset(Dataset):
 
     def __init__(self, dataset_name="Libosa2707/vietnamese-poem"):
         self.raw_dataset = load_dataset(dataset_name)
+
         self.tokenizer = AutoTokenizer.from_pretrained(
             "vinai/bartpho-word", use_fast=True
         )
@@ -77,13 +80,8 @@ class VNPDataLoader(DataLoader):
     """Vietnamese-Poem Data Loader"""
 
     def __init__(
-        self,
-        dataset=None,
-        batch_size=8,
-        num_workers=4,
-        shuffle=False,
+        self, dataset=None, batch_size=8, num_workers=4, shuffle=False, device=None
     ):
-        # Dataset
         self.ds = VNPDataset()
 
         self.data_collator = DataCollatorForLanguageModeling(
@@ -98,10 +96,17 @@ class VNPDataLoader(DataLoader):
             {"val": split_dataset["test"], "train": split_dataset["train"]}
         )
 
-        super().__init__(
-            self.dataset,
-            batch_size,
-            num_workers=num_workers,
-            shuffle=shuffle,
-            collate_fn=self.data_collator,
-        )
+        self.device = device
+
+        self.init_kwargs = {
+            "dataset": self.dataset,
+            "batch_size": batch_size,
+            "shuffle": shuffle,
+            "num_workers": num_workers,
+            "collate_fn": self.data_collator,
+        }
+
+        super().__init__(**self.init_kwargs)
+
+
+x = VNPDataset()

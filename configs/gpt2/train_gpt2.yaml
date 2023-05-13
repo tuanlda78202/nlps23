@@ -6,7 +6,6 @@ dataloader:
 
   args:
     batch_size: 8 # if gradient_accumulation_steps > 1, this is the micro-batch size
-    block_size: 8
     device: 'cuda'
     num_workers: 2 
 
@@ -19,11 +18,11 @@ arch:
   type: GPT2
 
   args:
-    block_size: 1024
-    vocab_size: 50304
+    block_size: 512
+    vocab_size: 64001
     n_layer: 12
     n_head: 12
-    n_emb: 768
+    n_embd: 768
     dropout: 0.0 # for pre-training 0 is good, for finetuning try 0.1+
     bias: False # do we use bias inside LayerNorm and Linear layers?
 
