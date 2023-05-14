@@ -16,10 +16,6 @@ from trainer import GPT2Trainer
 
 from model import GPTConfig
 
-arch = {"n_layer": 12, "n_head": 12, "n_embd": 768, "dropout": 0.0, "bias": False}
-print(GPTConfig(**arch))
-
-
 SEED = 42
 np.random.seed(SEED)
 torch.manual_seed(SEED)
@@ -31,8 +27,10 @@ def main(config):
     logger = config.get_logger("train")
 
     data_loader = config.init_obj("dataloader", module_data)
-    train_dataloader = data_loader.dataset["train"]
-    valid_dataloader = data_loader.dataset["val"]
+    train_dataloader, valid_dataloader = (
+        data_loader.dataset["train"],
+        data_loader.dataset["val"],
+    )
 
     model = config.init_obj("arch", module_arch)
     logger.info(model)

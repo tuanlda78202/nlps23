@@ -1,10 +1,6 @@
-from __future__ import print_function, division
-from typing import Iterable, Optional, Sequence, Union
 import numpy as np
-import torch
-from torch.utils.data import Dataset, DataLoader, Sampler
+from torch.utils.data import Dataset, DataLoader
 from datasets import load_dataset, DatasetDict
-from torch.utils.data.dataloader import _collate_fn_t, _worker_init_fn_t
 from transformers import (
     PreTrainedTokenizerBase,
     AutoTokenizer,
