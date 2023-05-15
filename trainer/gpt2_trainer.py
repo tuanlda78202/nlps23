@@ -11,6 +11,7 @@ import numpy as np
 import torch
 from contextlib import nullcontext
 from trainer.base_trainer import BaseTrainer
+from utils import inf_loop
 from tqdm import tqdm
 import wandb
 
@@ -24,7 +25,6 @@ class GPT2Trainer(BaseTrainer):
         self,
         model,
         config,
-        device,
         data_loader,
         valid_dataloader=None,
         len_epoch=None,
@@ -32,14 +32,16 @@ class GPT2Trainer(BaseTrainer):
         super().__init__(model, config, data_loader)
 
         self.config = config
-        self.data_config = self.config["data"]
+        self.data_config = self.config["dataloader"]
 
-        self.device = device
+        self.device = config["device"]
         self.ctx = (
             nullcontext()
             if self.device == "cpu"
             else torch.amp.autocast(device_type=self.device, dtype=torch.bfloat16)
         )
+
+        # Data Loader
         self.data_loader = data_loader
 
         if len_epoch is None:
@@ -55,21 +57,9 @@ class GPT2Trainer(BaseTrainer):
         self.do_validation = self.valid_dataloader is not None
         self.log_step = int(np.sqrt(data_loader.batch_size))
 
-        # DataFrame metrics
-        self.train_metrics = MetricTracker(
-            "loss", *[m.__name__ for m in self.metric_ftns], track=self.track
-        )
-        self.valid_metrics = MetricTracker(
-            "loss", *[m.__name__ for m in self.metric_ftns], track=self.track
-        )
-
         # GPT2
-        tokens_per_iter = (
-            self.data_config["gradient_accumulation_steps"]
-            * self.data_config["batch_size"]
-            * self.data_config["block_size"]
-        )
-        print(f"Tokens per iteration will be: {tokens_per_iter:,}")
+        self.grad_acc = self.data_config["gradient_accumulation_steps"]
+        self.bs = self.data_config["batch_size"]
 
     def _train_epoch(self, epoch):
         """
@@ -89,19 +79,39 @@ class GPT2Trainer(BaseTrainer):
         self.model.train()
         self.train_metrics.reset()
 
-        # FWD&BWD update, with optional gradient accumulation to simulate larger batch size
+        for batch_idx, loader in enumerate(tqdm_batch):
+            # Load to Device
+            if self.device == "cuda":
+                data = loader["img"].to(
+                    device=self.device, dtype=torch.cuda.FloatTensor
+                )
+                mask = loader["mask"].to(
+                    device=self.device, dtype=torch.cuda.FloatTensor
+                )
+
+            else:
+                data = loader["img"].to(device=self.device)
+                data = data.type(torch.FloatTensor)
+                mask = loader["mask"].to(device=self.device)
+                mask = mask.type(torch.FloatTensor)
+
+            self.optimizer.zero_grad()
+
+        # FWD & BWD update, with optional gradient accumulation to simulate larger batch size
         # and using the GradScaler if data type is float16
 
-        for micro_step in range(self.data_config["gradient_accumulation_steps"]):
+        for micro_step in range(self.grad_acc):
             with self.ctx:
                 logits, loss = self.model(X, Y)
+
                 loss = (
-                    loss / self.data_config["gradient_accumulation_steps"]
+                    loss / self.grad_acc
                 )  # scale the loss to account for gradient accumulation
 
             # immediately async prefetch next batch while model is doing the forward pass on the GPU
             X, Y = get_batch("train")
-            # backward pass, with gradient scaling if training in fp16
+
+            # BWD with gradient scaling if training in fp16
             scaler.scale(loss).backward()
 
         # Clip the gradient

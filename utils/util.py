@@ -2,6 +2,7 @@ import os
 import math
 import torch
 import yaml
+from itertools import repeat
 from pathlib import Path
 
 
@@ -16,6 +17,12 @@ def write_yaml(content, fname):
     fname = Path(fname)
     with fname.open("wt") as handle:
         yaml.dump(content, handle, indent=4, sort_keys=False)
+
+
+def inf_loop(data_loader):
+    """wrapper function for endless data loader."""
+    for loader in repeat(data_loader):
+        yield from loader
 
 
 def init_wandb(

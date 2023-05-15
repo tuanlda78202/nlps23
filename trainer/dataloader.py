@@ -24,14 +24,12 @@ class VNPDataset(Dataset):
             self.tokenization, batched=False, num_proc=4
         )
 
-        self.dataset = self.token_dataset.remove_columns(["text", "token_type_ids"])
-
     def __len__(self):
         return len(self.raw_dataset)
 
     def __getitem__(self, idx):
-        text = self.dataset["text"][idx]
-        genre = self.dataset["genre"][idx]
+        text = self.token_dataset["train"]["text"][idx]
+        genre = self.token_dataset["train"]["genre"][idx]
         idx = np.array([idx])
 
         return {"idx": idx, "text": text, "genre": genre}
@@ -80,13 +78,14 @@ class VNPDataLoader(DataLoader):
     def __init__(
         self, dataset=None, batch_size=8, num_workers=4, shuffle=False, device=None
     ):
-        self.ds = VNPDataset()
+        raw_ds = VNPDataset()
+        ds = raw_ds.token_dataset.remove_columns(["text", "token_type_ids"])
 
         self.data_collator = DataCollatorForLanguageModeling(
-            tokenizer=self.ds.tokenizer, mlm_probability=False
+            tokenizer=raw_ds.tokenizer, mlm_probability=False
         )
 
-        split_dataset = self.ds.dataset["train"].train_test_split(
+        split_dataset = ds["train"].train_test_split(
             test_size=0.1, seed=42, shuffle=True
         )
 
@@ -105,3 +104,7 @@ class VNPDataLoader(DataLoader):
         }
 
         super().__init__(**self.init_kwargs)
+
+
+dataloader = VNPDataLoader()
+print(next(iter(dataloader)))

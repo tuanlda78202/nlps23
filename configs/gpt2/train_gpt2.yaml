@@ -12,6 +12,7 @@ dataloader:
     num_workers: 6
 
   gradient_accumulation_steps: 5 * 1 # used to simulate larger batch sizes
+  block_size: 512
   dtype: 'bfloat16' # 'float32', 'bfloat16', or 'float16', the latter will auto implement a GradScaler
   compile: True # use PyTorch 2.0 to compile the model to be faster
 

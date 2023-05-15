@@ -33,13 +33,11 @@ def main(config):
     model = config.init_obj("arch", module_arch)
     logger.info(model)
 
-    device = torch.device(config["device"])
-    model = model.to(device)
+    model = model.to(config["device"])
 
     trainer = GPT2Trainer(
         model,
         config=config,
-        device=device,
         data_loader=train_dataloader,
         valid_dataloader=valid_dataloader,
     )
