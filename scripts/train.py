@@ -14,8 +14,6 @@ import model as module_arch
 from configs.parse_config import ConfigParser
 from trainer import GPT2Trainer
 
-from model import GPTConfig
-
 SEED = 42
 np.random.seed(SEED)
 torch.manual_seed(SEED)
@@ -35,7 +33,7 @@ def main(config):
     model = config.init_obj("arch", module_arch)
     logger.info(model)
 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = torch.device(config["device"])
     model = model.to(device)
 
     trainer = GPT2Trainer(
@@ -43,7 +41,7 @@ def main(config):
         config=config,
         device=device,
         data_loader=train_dataloader,
-        valid_data_loader=valid_dataloader,
+        valid_dataloader=valid_dataloader,
     )
 
     trainer.train()
@@ -73,7 +71,7 @@ if __name__ == "__main__":
         "--device",
         default="mps",
         type=str,
-        help="indices of GPUs to enable (default: all)",
+        help="type of device",
     )
 
     CustomArgs = collections.namedtuple("CustomArgs", "flags type target")

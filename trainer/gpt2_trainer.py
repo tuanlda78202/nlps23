@@ -2,8 +2,7 @@ import os, logging
 
 os.environ["WANDB_SILENT"] = "True"
 os.environ["WANDB_MODE"] = "offline"
-# os.makedirs("output", exist_ok=True)
-
+os.makedirs("output", exist_ok=True)
 logger = logging.getLogger("wandb")
 logger.setLevel(logging.ERROR)
 logger.setLevel(logging.WARNING)
@@ -14,15 +13,6 @@ from contextlib import nullcontext
 from trainer.base_trainer import BaseTrainer
 from tqdm import tqdm
 import wandb
-
-""" 
-{'name': 'VietnamesePoem-GPT2-124M', 'data': {'dataset': 'vietnamese-poem', 'gradient_accumulation_steps': '5 * 1', 
-'batch_size': 12, 'block_size': 1024}, 'arch': {'type': 'GPT2', 'args': {'n_layer': 12, 'n_head': 12, 'n_emb': 768, 
-'dropout': 0.0, 'bias': False}}, 'optimizer': {'type': 'LRDecay', 'args': {'decay_lr': True, 'warmup_iters': 2000, 
-'lr_decay_iters': 600000, 'min_lr': '6e-5'}}, 'eval': {'eval_interval': 2000, 'eval_iters': 200, 'log_interval': 10, 
-'eval_only': False, 'always_save_checkpoint': True, 'init_from': 'scratch'}, 'system': {'device': 'cuda', 'dtype': 'bfloat16', 
-'compile': True}, 'wandb': {'wandb_log': False, 'wandb_project': 'nlps23', 'wandb_run_name': 'vietnamese-poem_gpt2-124M'}}
-"""
 
 
 class GPT2Trainer(BaseTrainer):
@@ -36,7 +26,7 @@ class GPT2Trainer(BaseTrainer):
         config,
         device,
         data_loader,
-        valid_data_loader=None,
+        valid_dataloader=None,
         len_epoch=None,
     ):
         super().__init__(model, config, data_loader)
@@ -61,8 +51,8 @@ class GPT2Trainer(BaseTrainer):
             self.data_loader = inf_loop(data_loader)
             self.len_epoch = len_epoch
 
-        self.valid_data_loader = valid_data_loader
-        self.do_validation = self.valid_data_loader is not None
+        self.valid_dataloader = valid_dataloader
+        self.do_validation = self.valid_dataloader is not None
         self.log_step = int(np.sqrt(data_loader.batch_size))
 
         # DataFrame metrics
@@ -261,7 +251,7 @@ class GPT2Trainer(BaseTrainer):
                 f"iter {iter_num}: loss {lossf:.4f}, time {dt*1000:.2f}ms, mfu {running_mfu*100:.2f}%"
             )
 
-            for batch_idx, loader in enumerate(self.valid_data_loader):
+            for batch_idx, loader in enumerate(self.valid_dataloader):
                 # Load to Device
                 if self.device == "cuda":
                     data = loader["img"].to(
@@ -296,7 +286,7 @@ class GPT2Trainer(BaseTrainer):
 
                 # Logging
                 self.track.set_step(
-                    (epoch - 1) * len(self.valid_data_loader) + batch_idx, "valid"
+                    (epoch - 1) * len(self.valid_dataloader) + batch_idx, "valid"
                 )
                 self.valid_metrics.update("loss", loss.item())
 

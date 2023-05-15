@@ -18,11 +18,13 @@ class VNPDataset(Dataset):
             "vinai/bartpho-word", use_fast=True
         )
 
-        self.dataset = self.process_poem(self.raw_dataset)
+        self.process_dataset = self.process_poem(self.raw_dataset)
 
-        self.dataset = self.dataset.map(self.tokenization, batched=False, num_proc=4)
+        self.token_dataset = self.process_dataset.map(
+            self.tokenization, batched=False, num_proc=4
+        )
 
-        self.dataset = self.dataset.remove_columns(["text", "token_type_ids"])
+        self.dataset = self.token_dataset.remove_columns(["text", "token_type_ids"])
 
     def __len__(self):
         return len(self.raw_dataset)
@@ -103,6 +105,3 @@ class VNPDataLoader(DataLoader):
         }
 
         super().__init__(**self.init_kwargs)
-
-
-x = VNPDataset()
