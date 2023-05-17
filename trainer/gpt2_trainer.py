@@ -39,8 +39,8 @@ class GPT2Trainer(BaseTrainer):
 
         self.ctx = (
             nullcontext()
-            if self.device == "cpu"
-            else torch.amp.autocast(device_type=self.device, dtype=torch.bfloat16)
+            if self.device == torch.device("cpu")
+            else torch.amp.autocast(device_type="cuda", dtype=torch.bfloat16)
         )
 
         # Data Loader
@@ -61,7 +61,7 @@ class GPT2Trainer(BaseTrainer):
 
         # GPT2
         self.grad_acc = self.data_config["gradient_accumulation_steps"]
-        self.bs = self.data_config["batch_size"]
+        self.bs = self.data_config["args"]["batch_size"]
 
     def _train_epoch(self, epoch):
         """
