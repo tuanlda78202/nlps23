@@ -78,25 +78,29 @@ class BaseTrainer:
                 "to choose appropriate module"
             )
 
+        self.meta_vocab_size = config["arch"]["args"]["vocab_size"]
+
+        """
         if config.init_from == "resume":
-            print(f"Resuming training from {out_dir}")
+            print("Resuming training from output")
             self._resume_checkpoint(config.init_from)
 
+        
         elif config.init_from == "scratch":
             print("Initializing a new model from scratch")
 
             # determine the vocab size we'll use for from-scratch training
-            if meta_vocab_size is None:
+            if self.meta_vocab_size is None:
                 print(
-                    "defaulting to vocab_size of GPT2-2 to 50304 (50257 rounded up for efficiency)"
+                    "defaulting to vocab_size of VinAI-BART-Pho to 40031 (40031 rounded up for efficiency)"
                 )
 
             model_args["vocab_size"] = (
-                meta_vocab_size if meta_vocab_size is not None else 50304
+                self.meta_vocab_size if self.meta_vocab_size is not None else 40031
             )
 
-            gptconf = GPTConfig(**model_args)
-            model = GPT2(gptconf)
+            model = GPT2(GPTConfig(**model_args))
+        """
 
     @abstractmethod
     def _train_epoch(self, epoch):

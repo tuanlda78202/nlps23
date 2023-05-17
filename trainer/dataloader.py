@@ -334,25 +334,24 @@ class VNPBaseDataLoader(DataLoader):
         self.test_sampler = dataset.get_data
 
         self.init_kwargs = {
-            "dataset": dataset,
             "batch_size": batch_size,
             "shuffle": self.shuffle,
             "num_workers": num_workers,
             "collate_fn": data_collator,
         }
-        super().__init__(sampler=self.sampler, **self.init_kwargs)
+        super().__init__(dataset=self.sampler, **self.init_kwargs)
 
     def get_validation(self):
         if self.valid_sampler is None:
             return None
         else:
-            return DataLoader(sampler=self.valid_sampler, **self.init_kwargs)
+            return DataLoader(dataset=self.valid_sampler, **self.init_kwargs)
 
     def get_test(self):
         if self.valid_sampler is None:
             return None
         else:
-            return DataLoader(sampler=self.test_sampler, **self.init_kwargs)
+            return DataLoader(dataset=self.test_sampler, **self.init_kwargs)
 
 
 class VNPDataLoader(VNPBaseDataLoader):

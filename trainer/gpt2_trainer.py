@@ -24,6 +24,7 @@ class GPT2Trainer(BaseTrainer):
     def __init__(
         self,
         model,
+        device,
         config,
         data_loader,
         valid_dataloader=None,
@@ -34,7 +35,8 @@ class GPT2Trainer(BaseTrainer):
         self.config = config
         self.data_config = self.config["dataloader"]
 
-        self.device = config["device"]
+        self.device = device
+
         self.ctx = (
             nullcontext()
             if self.device == "cpu"
