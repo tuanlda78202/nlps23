@@ -16,7 +16,7 @@ class VNPDataset(Dataset):
         max_title_length=-1,
         max_format_length=-1,
         max_sentence_length=-1,
-        max_source_length=36,
+        max_source_length=42,
         max_target_length=384,
         with_title=True,
         with_format=True,
@@ -44,13 +44,13 @@ class VNPDataset(Dataset):
         self.tokenizer = tokenizer
         self.max_source_length = max_source_length
 
-        # source sentence format: tiêu đề: <title> <eos> khổ thơ: <genre> <eos> hai câu đầu: <sentence_1&2>
+        # source sentence format: làm thơ với tiêu đề: <title> <eos> tuân theo thể thơ: <genre> <eos> hai câu đầu: <sentence_1&2>
         max_all = (
-            len(self.tokenizer("tiêu đề:")["input_ids"])
+            len(self.tokenizer("làm thơ với tiêu đề:")["input_ids"])
             - 2
             + max_title_length
             + 1
-            + len(self.tokenizer("thể thơ:")["input_ids"])
+            + len(self.tokenizer("tuân theo thể thơ:")["input_ids"])
             - 2
             + max_format_length
         )
@@ -155,10 +155,10 @@ class VNPDataset(Dataset):
             if self.with_format:  # with "thể thơ"
                 if self.with_1st_sentence:
                     texts += [
-                        "tiêu đề: "
+                        "làm thơ với tiêu đề: "
                         + examples["title"][idx]
                         + self.tokenizer.eos_token
-                        + "thể thơ: "
+                        + "tuân theo thể thơ: "
                         + examples["genre"][idx]
                         + self.tokenizer.eos_token
                         + "câu đầu:"
@@ -172,10 +172,10 @@ class VNPDataset(Dataset):
                     ]
                 if self.with_2nd_sentence:
                     texts += [
-                        "tiêu đề: "
+                        "làm thơ với tiêu đề: "
                         + examples["title"][idx]
                         + self.tokenizer.eos_token
-                        + "thể thơ: "
+                        + "tuân theo thể thơ: "
                         + examples["genre"][idx]
                         + self.tokenizer.eos_token
                         + "hai câu đầu: "
@@ -189,10 +189,10 @@ class VNPDataset(Dataset):
                     ]
 
                 texts += [
-                    "tiêu đề: "
+                    "làm thơ với tiêu đề: "
                     + examples["title"][idx]
                     + self.tokenizer.eos_token
-                    + "thể thơ: "
+                    + "tuân theo thể thơ: "
                     + examples["genre"][idx]
                     for idx in range(len(examples["text"]))
                 ]
@@ -200,14 +200,14 @@ class VNPDataset(Dataset):
 
                 if self.is_augment:
                     texts += [
-                        "thể thơ: " + examples["genre"][idx]
+                        "tuân theo thể thơ: " + examples["genre"][idx]
                         for idx in range(len(examples["text"]))
                     ]
                     labels += examples["text"]
             else:  # without "thể thơ"
                 if self.with_1st_sentence:
                     texts += [
-                        "tiêu đề: "
+                        "làm thơ với tiêu đề: "
                         + examples["title"][idx]
                         + self.tokenizer.eos_token
                         + "câu đầu:"
@@ -221,7 +221,7 @@ class VNPDataset(Dataset):
                     ]
                 if self.with_2nd_sentence:
                     texts += [
-                        "tiêu đề: "
+                        "làm thơ với tiêu đề: "
                         + examples["title"][idx]
                         + self.tokenizer.eos_token
                         + "hai câu đầu:"
@@ -235,7 +235,7 @@ class VNPDataset(Dataset):
                     ]
 
                 texts += [
-                    "tiêu đề: " + examples["title"][idx]
+                    "làm thơ với tiêu đề:" + examples["title"][idx]
                     for idx in range(len(examples["text"]))
                 ]
                 labels += examples["text"]
@@ -243,7 +243,7 @@ class VNPDataset(Dataset):
             if self.with_format:  # with "thể thơ"
                 if self.with_1st_sentence:
                     texts += [
-                        "thể thơ: "
+                        "tuân theo thể thơ: "
                         + examples["genre"][idx]
                         + self.tokenizer.eos_token
                         + "câu đầu:"
@@ -257,7 +257,7 @@ class VNPDataset(Dataset):
                     ]
                 if self.with_2nd_sentence:
                     texts += [
-                        "thể thơ: "
+                        "tuân theo thể thơ: "
                         + examples["genre"][idx]
                         + self.tokenizer.eos_token
                         + "hai câu đầu:"
@@ -271,7 +271,7 @@ class VNPDataset(Dataset):
                     ]
 
                 texts += [
-                    "thể thơ: " + examples["genre"][idx]
+                    "tuân theo thể thơ: " + examples["genre"][idx]
                     for idx in range(len(examples["text"]))
                 ]
                 labels += examples["text"]
