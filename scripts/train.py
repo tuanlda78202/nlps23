@@ -9,10 +9,11 @@ import argparse
 import collections
 import torch
 import numpy as np
-import trainer.dataloader as module_data
+from trainer.dataloader import VNPDataLoader
 import model as module_arch
 from configs.parse_config import ConfigParser
 from trainer import GPT2Trainer
+from transformers import AutoTokenizer
 
 SEED = 42
 np.random.seed(SEED)
@@ -24,19 +25,23 @@ torch.backends.cuda.matmul.allow_tf32 = True
 def main(config):
     logger = config.get_logger("train")
 
-    data_loader = config.init_obj("dataloader", module_data)
-    train_dataloader, valid_dataloader = (
-        data_loader.dataset["train"],
-        data_loader.dataset["val"],
-    )
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    tokenizer = AutoTokenizer.from_pretrained("vinai/bartpho-word")
+    tokenizer.add_tokens("\n")
+
+    # data_loader = config.init_obj("dataloader", module_data)
+    train_dataloader = VNPDataLoader(tokenizer=tokenizer, device=device)
+    valid_dataloader = train_dataloader.get_validation()
 
     model = config.init_obj("arch", module_arch)
     logger.info(model)
 
-    model = model.to(config["device"])
+    model = model.to(device)
 
     trainer = GPT2Trainer(
         model,
+        device=device,
         config=config,
         data_loader=train_dataloader,
         valid_dataloader=valid_dataloader,
@@ -67,7 +72,7 @@ if __name__ == "__main__":
     args.add_argument(
         "-d",
         "--device",
-        default="mps",
+        default="cuda",
         type=str,
         help="type of device",
     )
