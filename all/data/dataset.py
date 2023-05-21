@@ -1,7 +1,6 @@
 from datasets import load_dataset
-from torch.utils.data import Dataset, DataLoader
-from transformers import DataCollatorForLanguageModeling, DataCollatorForSeq2Seq
-from transformers import PreTrainedTokenizerBase, AutoTokenizer
+from torch.utils.data import Dataset
+from transformers import PreTrainedTokenizerBase
 import underthesea
 
 
@@ -313,73 +312,3 @@ class VNPDataset(Dataset):
         )["input_ids"]
 
         return model_inputs
-
-
-class VNPBaseDataLoader(DataLoader):
-    """
-    Base class for all data loaders
-    """
-
-    def __init__(
-        self, dataset: VNPDataset, batch_size, shuffle, data_collator, num_workers=1
-    ):
-        self.shuffle = shuffle
-
-        # Split Train & Valid & Test
-        dataset.get_train_dataset()
-        self.sampler = dataset.get_data
-        dataset.get_valid_dataset()
-        self.valid_sampler = dataset.get_data
-        dataset.get_test_dataset()
-        self.test_sampler = dataset.get_data
-
-        self.init_kwargs = {
-            "batch_size": batch_size,
-            "shuffle": self.shuffle,
-            "num_workers": num_workers,
-            "collate_fn": data_collator,
-        }
-        super().__init__(dataset=self.sampler, **self.init_kwargs)
-
-    def get_validation(self):
-        if self.valid_sampler is None:
-            return None
-        else:
-            return DataLoader(dataset=self.valid_sampler, **self.init_kwargs)
-
-    def get_test(self):
-        if self.valid_sampler is None:
-            return None
-        else:
-            return DataLoader(dataset=self.test_sampler, **self.init_kwargs)
-
-
-class VNPDataLoader(VNPBaseDataLoader):
-    """Vietnamese-Poem Data Loader"""
-
-    def __init__(
-        self,
-        tokenizer,
-        batch_size=8,
-        num_workers=4,
-        shuffle=False,
-        device=None,
-        **kwargs
-    ):
-        self.dataset = VNPDataset(tokenizer=tokenizer, **kwargs)
-
-        self.data_collator = DataCollatorForSeq2Seq(
-            tokenizer=tokenizer,
-        )
-
-        self.device = device
-
-        self.init_kwargs = {
-            "dataset": self.dataset,
-            "batch_size": batch_size,
-            "shuffle": shuffle,
-            "num_workers": num_workers,
-            "data_collator": self.data_collator,
-        }
-
-        super().__init__(**self.init_kwargs)
