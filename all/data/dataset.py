@@ -101,7 +101,7 @@ class VNPDataset(Dataset):
         token_dataset = process_dataset.map(
             self.tokenization,
             batched=True,
-            num_proc=2,
+            num_proc=4,
             remove_columns=["title", "genre", "text"],
         )
 

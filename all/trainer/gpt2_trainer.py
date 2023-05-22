@@ -62,6 +62,11 @@ class GPT2Trainer(BaseTrainer):
         # GPT2
         self.grad_acc = self.data_config["gradient_accumulation_steps"]
         self.bs = self.data_config["args"]["batch_size"]
+        self.optimizer = optimizer = self.model.configure_optimizers(
+            1e-1, 6e-4, (0.9, 0.95), "cuda"
+        )
+        self.scaler = torch.cuda.amp.GradScaler()
+        self.grad_clip = 1.0
 
     def _train_epoch(self, epoch):
         """
@@ -79,55 +84,60 @@ class GPT2Trainer(BaseTrainer):
         )
 
         self.model.train()
-        self.train_metrics.reset()
+        # self.train_metrics.reset()
 
         for batch_idx, loader in enumerate(tqdm_batch):
-            # Load to Device
-            if self.device == "cuda":
-                data = loader["img"].to(
-                    device=self.device, dtype=torch.cuda.FloatTensor
-                )
-                mask = loader["mask"].to(
-                    device=self.device, dtype=torch.cuda.FloatTensor
-                )
+            input = loader["input_ids"].to(device=self.device)
+            input = input.type(torch.int)
+            label = loader["labels"].to(device=self.device)
+            label = label.type(torch.cuda.FloatTensor)
 
-            else:
-                data = loader["img"].to(device=self.device)
-                data = data.type(torch.FloatTensor)
-                mask = loader["mask"].to(device=self.device)
-                mask = mask.type(torch.FloatTensor)
+            print(input.shape, label.shape)
+            # passes and weights update
+            with torch.set_grad_enabled(True):
+                # forward pass
+                logits, loss = self.model(input, label)
 
-            self.optimizer.zero_grad()
+                # normalize loss to account for batch accumulation
+                loss = loss / self.grad_acc
 
-        # FWD & BWD update, with optional gradient accumulation to simulate larger batch size
-        # and using the GradScaler if data type is float16
+                # backward pass
+                loss.backward()
 
+                # weights update
+                if ((batch_idx + 1) % self.grad_acc == 0) or (
+                    batch_idx + 1 == len(self.data_loader)
+                ):
+                    self.optimizer.step()
+                    self.optimizer.zero_grad()
+
+        """
         for micro_step in range(self.grad_acc):
-            with self.ctx:
-                logits, loss = self.model(X, Y)
+                with self.ctx:
+                    logits, loss = self.model(input, label)
 
-                loss = (
-                    loss / self.grad_acc
-                )  # scale the loss to account for gradient accumulation
+                    loss = (
+                        loss / self.grad_acc
+                    )  # scale the loss to account for gradient accumulation
 
-            # immediately async prefetch next batch while model is doing the forward pass on the GPU
-            X, Y = get_batch("train")
+                # immediately async prefetch next batch while model is doing the forward pass on the GPU
+                X, Y = get_batch("train")
 
-            # BWD with gradient scaling if training in fp16
-            scaler.scale(loss).backward()
+                # BWD with gradient scaling if training in fp16
+                self.scaler.scale(loss).backward()
 
-        # Clip the gradient
-        if grad_clip != 0.0:
-            scaler.unscale_(optimizer)
-            torch.nn.utils.clip_grad_norm_(self.model.parameters(), grad_clip)
+            # Clip the gradient
+            if self.grad_clip != 0.0:
+                self.scaler.unscale_(self.optimizer)
+                torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.grad_clip)
 
-        # Step the optimizer and scaler if training in fp16
-        scaler.step(optimizer)
-        scaler.update()
+            # Step the optimizer and scaler if training in fp16
+            self.scaler.step(self.optimizer)
+            self.scaler.update()
 
-        # Flush the gradients as soon as we can, no need for this memory anymore
-        optimizer.zero_grad(set_to_none=True)
-
+            # Flush the gradients as soon as we can, no need for this memory anymore
+            self.optimizer.zero_grad(set_to_none=True)
+        """
         """
         for batch_idx, loader in enumerate(tqdm_batch):
             # Load to Device

@@ -7,6 +7,19 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
+def new_gelu(x):
+    """GELU activation function"""
+
+    return (
+        0.5
+        * x
+        * (
+            1.0
+            + torch.tanh(math.sqrt(2.0 / math.pi) * (x + 0.044715 * torch.pow(x, 3.0)))
+        )
+    )
+
+
 class LayerNorm(nn.Module):
     """LayerNorm (learnable affine transform parameters γ & β) with optional β"""
 
@@ -133,7 +146,7 @@ class GPTConfig:
     n_embd: int = 768
     dropout: float = 0.0
 
-    vocab_size: int = 64001
+    vocab_size: int = 40031
 
     # True: bias in Linears and LayerNorms, like GPT2. False: a bit better and faster
     bias: bool = True
@@ -263,8 +276,8 @@ class GPT2(nn.Module):
             "gpt2-large": dict(n_layer=36, n_head=20, n_embd=1280),  # 774M params
             "gpt2-xl": dict(n_layer=48, n_head=25, n_embd=1600),  # 1558M params
         }[model_type]
-        print("forcing vocab_size=64001, block_size=512, bias=True")
-        config_args["vocab_size"] = 64001  # always 50257 for GPT2 model checkpoints
+        print("forcing vocab_size=40031, block_size=512, bias=True")
+        config_args["vocab_size"] = 40031  # always 50257 for GPT2 model checkpoints
         config_args["block_size"] = 512  # always 1024 for GPT2 model checkpoints
         config_args["bias"] = True  # always True for GPT2 model checkpoints
         # we can override the dropout rate, if desired

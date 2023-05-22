@@ -1,11 +1,6 @@
-import os, sys
-
-sys.path.append(os.getcwd())
-
 from all.base.base_dataloader import VNPBaseDataLoader
 from all.data.dataset import VNPDataset
 from transformers import DataCollatorForSeq2Seq
-from transformers import AutoTokenizer
 
 
 class VNPDataLoader(VNPBaseDataLoader):
@@ -37,8 +32,3 @@ class VNPDataLoader(VNPBaseDataLoader):
         }
 
         super().__init__(**self.init_kwargs)
-
-
-tokenizer = AutoTokenizer.from_pretrained("vinai/bartpho-word")
-x = VNPDataLoader(tokenizer=tokenizer)
-print(next(iter(x)))
