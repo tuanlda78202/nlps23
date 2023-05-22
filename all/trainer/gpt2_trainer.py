@@ -10,7 +10,7 @@ logger.setLevel(logging.WARNING)
 import numpy as np
 import torch
 from contextlib import nullcontext
-from trainer.base_trainer import BaseTrainer
+from all.base.base_trainer import BaseTrainer
 from utils import inf_loop
 from tqdm import tqdm
 import wandb

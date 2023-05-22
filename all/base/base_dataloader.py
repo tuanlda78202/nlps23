@@ -1,3 +1,4 @@
+from all.data.dataset import VNPDataset
 from torch.utils.data import DataLoader
 
 
