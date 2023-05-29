@@ -1,6 +1,6 @@
 from all.base.base_dataloader import VNPBaseDataLoader
 from all.data.dataset import VNPDataset
-from transformers import DataCollatorForSeq2Seq
+from all.data.collate_fn import DataCollatorForSeq2Seq, DataCollatorForLanguageModeling
 
 
 class VNPDataLoader(VNPBaseDataLoader):
@@ -9,17 +9,30 @@ class VNPDataLoader(VNPBaseDataLoader):
     def __init__(
         self,
         tokenizer,
+        tokenizer_name,
+        model=None,
+        model_architecture=None,
         batch_size=8,
         num_workers=4,
         shuffle=False,
         device=None,
         **kwargs
     ):
-        self.dataset = VNPDataset(tokenizer=tokenizer, **kwargs)
+        self.dataset = VNPDataset(tokenizer=tokenizer, model_architecture=model_architecture,
+                                  **kwargs)
 
-        self.data_collator = DataCollatorForSeq2Seq(
-            tokenizer=tokenizer,
-        )
+        if model_architecture == "decoder":
+            self.data_collator = DataCollatorForSeq2Seq(
+                tokenizer=tokenizer,
+                model=model,
+            )
+        elif model_architecture == "encoder_decoder":
+            self.data_collator = DataCollatorForLanguageModeling(
+                tokenizer=tokenizer,
+                mlm=False,
+            )
+        else:
+            raise Exception("Currently not support others architectures than decoder and encoder-decoder architecture")
 
         self.device = device
 

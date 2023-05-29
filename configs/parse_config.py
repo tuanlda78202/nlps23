@@ -63,7 +63,6 @@ class ConfigParser:
         if args.resume is not None:
             resume = Path(args.resume)
             cfg_fname = resume.parent / "config.yaml"
-
         else:
             msg_no_cfg = "Configuration file need to be specified. Add '-c config.yaml', for example."
             assert args.config is not None, msg_no_cfg
