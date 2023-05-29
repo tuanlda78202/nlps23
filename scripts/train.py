@@ -11,9 +11,10 @@ import argparse
 import collections
 import torch
 import numpy as np
+from utils import util
 
 from all.data.dataloader import VNPDataLoader
-import all.data.dataset as module_data
+import all.data as module_data
 import all.data.collate_fn as module_collator
 
 import all.model as module_arch
@@ -38,7 +39,7 @@ def main(config):
     logger = config.get_logger("train")
 
     tokenizer_name = config.dataset['args']['tokenizer_name']
-    tokenizer = utils.get_tokenizer(tokenizer_name=tokenizer_name)
+    tokenizer = util.get_tokenizer(tokenizer_name=tokenizer_name)
 
     # data_loader = config.init_obj("dataloader", module_data)
     dataset = config.init_ftn("dataset", module_data)
