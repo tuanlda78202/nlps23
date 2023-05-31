@@ -35,9 +35,10 @@ class AMSample:
                                       top_p=self.top_p
                                       )
         detok_outputs = [self.tokenizer.decode(x, skip_special_tokens=True) for x in outputs]
-        with open(self.save_sample_dir, "w") as f:
+        with open(f"experiments/{self.save_sample_dir}", "w") as f:
             for i in range(len(detok_outputs)):
                 sample = {"source": self.tokenizer.decode(test_dataset["input_ids"][i]),
-                          "target": detok_outputs[i]
+                          "target": detok_outputs[i],
+                          "real": self.tokenizer.deocde(test_dataset["labels"][i])
                           }
                 json.dump(sample, f, indent=4)

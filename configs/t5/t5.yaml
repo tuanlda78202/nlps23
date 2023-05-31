@@ -137,3 +137,15 @@ trainer:
 
   api_key_file: ./configs/api/tuanlda78202
   entity: tuanlda78202
+
+
+evaluation:
+  type: ARSample
+
+  args:
+    save_sample_dir: "t5_first"
+    do_sample: True
+    max_length: 100
+    repetition_penalty: 20.0
+    top_k: 50
+    top_p: 0.92

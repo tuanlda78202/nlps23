@@ -15,6 +15,7 @@ from utils import util
 
 import all.data.dataset as module_data
 import all.data.collate_fn as module_collator
+import all.evaluation as module_eval
 
 from configs.parse_config import ConfigParser
 import transformers
@@ -82,7 +83,9 @@ def main(config):
 
     trainer.train()
 
-    test_samples = config.init_ftn("evaluation", )
+    test_samples = config.init_ftn("evaluation", module_eval)
+    test_samples.generate(test_dataset=test_dataset)
+
 
 if __name__ == "__main__":
     args = argparse.ArgumentParser(description="Vietnamese Poem Generator")
