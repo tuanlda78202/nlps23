@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from transformers import PreTrainedTokenizerBase
 from utils.util import PaddingStrategy
-from typing import Any, Callable, Dict, List, NewType, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 import numpy as np
 from collections.abc import Mapping
 
@@ -205,6 +205,7 @@ class DataCollatorForLanguageModeling(DataCollatorMixin):
     </Tip>"""
 
     tokenizer: PreTrainedTokenizerBase
+    model: Optional[Any] = None
     mlm: bool = True
     mlm_probability: float = 0.15
     pad_to_multiple_of: Optional[int] = None
@@ -331,17 +332,3 @@ class DataCollatorForLanguageModeling(DataCollatorMixin):
         # The rest of the time (10% of the time) we keep the masked input tokens unchanged
         return inputs, labels
 
-
-def get_data_collator(model_architecture, tokenizer, model=None):
-    if model_architecture == "decoder":
-        data_collator = DataCollatorForSeq2Seq(
-            tokenizer=tokenizer,
-            model=model,
-        )
-    elif model_architecture == "encoder_decoder":
-        data_collator = DataCollatorForLanguageModeling(
-            tokenizer=tokenizer,
-            mlm=False,
-        )
-    else:
-        raise Exception("Currently not support others architectures than decoder and encoder-decoder architecture")

@@ -4,7 +4,7 @@ from pathlib import Path
 from functools import reduce, partial
 from operator import getitem
 from datetime import datetime
-from utils.log import setup_logging
+from utils import setup_logging
 from utils import load_yaml, write_yaml
 from all.model.gpt2 import GPTConfig
 

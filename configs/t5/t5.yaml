@@ -20,10 +20,10 @@ dataset:
   type: VNPDataset
 
   args:
-    tokenizer_name: "bartpho-word"
+    tokenizer_name: "t5"
     valid_size: 0.1
     test_size: 0.1
-    model_architecture: "decoder"
+    model_architecture: "encoder_decoder"
     max_title_length: -1
     max_format_length: -1
     max_sentence_length: -1
@@ -36,19 +36,28 @@ dataset:
     is_augment: False
     dataset_name: "Libosa2707/vietnamese-poem"
 
-
-
-arch:
-  type: GPT2
+collator:
+  type: DataCollatorForSeq2Seq
 
   args:
-    block_size: 320
-    vocab_size: 40031
-    n_layer: 12
-    n_head: 12
-    n_embd: 768
-    dropout: 0.0 # for pre-training 0 is good, for finetuning try 0.1+
-    bias: False # do we use bias inside LayerNorm and Linear layers?
+    padding: True
+    max_length:  None
+    pad_to_multiple_of:  None
+    label_pad_token_id: -100
+    return_tensors: "pt"
+
+
+#arch:
+#  type: GPT2
+#
+#  args:
+#    block_size: 320
+#    vocab_size: 40031
+#    n_layer: 12
+#    n_head: 12
+#    n_embd: 768
+#    dropout: 0.0 # for pre-training 0 is good, for finetuning try 0.1+
+#    bias: False # do we use bias inside LayerNorm and Linear layers?
 
 
 optimizer:
@@ -80,6 +89,38 @@ eval:
   init_from: 'scratch' # 'scratch' or 'resume' or 'gpt2*'
 
 init_from: "scratch"
+
+training_arguments:
+  type: Seq2SeqTrainingArguments
+
+  args:
+    output_dir: "experiments/"
+    overwrite_output_dir: True
+    per_device_train_batch_size: 8
+    per_device_eval_batch_size: 16
+
+    # optimizer, lr scheduler and warm-up step
+    learning_rate: 2e-5
+    weight_decay: 0
+    adam_beta1: 0.9
+    adam_beta2: 0.999
+    adam_epsilon: 1e-8
+    num_train_epochs: 20
+    lr_schedule_type: "linear"  # linear / cosine / cosine_with_restarts / polynomial / constant / constant_with_warmup / inverse_sqrt / reduce_lr_on_plateau
+    warmup_steps: 1000
+    warmup_ratio: 0.05
+    # logging
+    logging_steps: 100
+
+    # save checkpoint
+    save_strategy: "steps"  # "no" / "epoch"
+    save_steps: 1000
+    save_total_limit: 1
+
+    # quantization
+    fp16: False
+
+    report_to: "wandb"
 
 trainer:
   type: Trainer

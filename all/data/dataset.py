@@ -128,6 +128,8 @@ class VNPDataset:
         self.max_source_length = (
             max_source_length if max_source_length > max_all else max_all
         )
+        if model_architecture == "decoder":
+            self.max_source_length = self.max_source_length + self.max_target_length
 
         self.dataset = self.prepare_dataset()
 
@@ -192,7 +194,7 @@ class VNPDataset:
             process_poem_text,
             batched=True,
             num_proc=4,
-            load_from_cache_file=False,
+            load_from_cache_file=True,
             remove_columns=["id", "content", "title", "url", "genre"],
         )
         return dataset
@@ -299,6 +301,12 @@ class VNPDataset:
                             labels.append(
                                 "\n".join(examples["text"][idx].split("\n")[1:])
                             )
+        # in case batch has no data
+        if len(texts) == 0:
+            texts = ["\n".join(examples["text"][0].split("\n")[:2])
+                     + "\n"]
+            labels = ["\n".join(examples["text"][0].split("\n")[2:])
+                      ]
 
         if self.model_architecture == "decoder":
             texts = [texts[idx] + labels[idx] for idx in range(len(labels))]
