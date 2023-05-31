@@ -29,7 +29,7 @@ torch.manual_seed(SEED)
 torch.backends.cudnn.benchmark = True
 torch.backends.cuda.matmul.allow_tf32 = True
 
-model_name = "gpt2"
+model_name = "t5"
 
 # model_architecture = "encoder_decoder"
 
@@ -58,6 +58,7 @@ def main(config):
         model.resize_token_embeddings(len(tokenizer))
     elif model_name == "t5":
         model = AutoModelForSeq2SeqLM.from_pretrained("VietAI/vit5-base")
+        model.resize_token_embeddings(len(tokenizer))
     elif model_name == "hmm":
         model = ...
     elif model_name == "difflm":
@@ -84,6 +85,7 @@ def main(config):
     trainer.train()
 
     test_samples = config.init_ftn("evaluation", module_eval)
+    test_samples = test_samples(tokenizer=tokenizer, trainer=trainer)
     test_samples.generate(test_dataset=test_dataset)
 
 

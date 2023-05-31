@@ -41,4 +41,4 @@ class AMSample:
                           "target": detok_outputs[i],
                           "real": self.tokenizer.deocde(test_dataset["labels"][i])
                           }
-                json.dump(sample, f, indent=4)
+                json.dump(sample, f, indent=4, ensure_ascii=False)
