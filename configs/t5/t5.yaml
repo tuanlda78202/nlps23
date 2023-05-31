@@ -41,8 +41,8 @@ collator:
 
   args:
     padding: True
-    max_length:  None
-    pad_to_multiple_of:  None
+    max_length:  null
+    pad_to_multiple_of:  null
     label_pad_token_id: -100
     return_tensors: "pt"
 
@@ -100,11 +100,11 @@ training_arguments:
     per_device_eval_batch_size: 16
 
     # optimizer, lr scheduler and warm-up step
-    learning_rate: 2e-5
+    learning_rate: 0.00002
     weight_decay: 0
     adam_beta1: 0.9
     adam_beta2: 0.999
-    adam_epsilon: 1e-8
+    adam_epsilon: 0.00000001
     num_train_epochs: 20
     lr_scheduler_type: "linear"  # linear / cosine / cosine_with_restarts / polynomial / constant / constant_with_warmup / inverse_sqrt / reduce_lr_on_plateau
     warmup_steps: 1000

@@ -111,7 +111,7 @@ def get_tokenizer(tokenizer_name) -> PreTrainedTokenizerBase:
     else:
         assert Exception(f"Tokenizer {tokenizer_name} is not exist.")
 
-    tokenizer.add_tokens([{"\n"} - tokenizer.get_vocab().keys()])
+    tokenizer.add_tokens(list({"<\n>"} - tokenizer.get_vocab().keys()))
     return tokenizer
 
 
