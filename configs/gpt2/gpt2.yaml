@@ -37,14 +37,10 @@ dataset:
     dataset_name: "Libosa2707/vietnamese-poem"
 
 collator:
-  type: DataCollatorForSeq2Seq
+  type: DataCollatorForLanguageModeling
 
   args:
-    padding: True
-    max_length:  null
-    pad_to_multiple_of:  null
-    label_pad_token_id: -100
-    return_tensors: "pt"
+    mlm: False
 
 
 #arch:
@@ -91,7 +87,7 @@ eval:
 init_from: "scratch"
 
 training_arguments:
-  type: Seq2SeqTrainingArguments
+  type: TrainingArguments
 
   args:
     output_dir: "experiments/"
@@ -143,7 +139,7 @@ evaluation:
   type: ARSample
 
   args:
-    save_sample_dir: "t5_first"
+    save_sample_dir: "gpt2_first"
     do_sample: True
     max_length: 100
     repetition_penalty: 20.0

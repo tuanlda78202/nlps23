@@ -3,7 +3,7 @@ import os
 import json
 
 
-class AMSample:
+class ARSample:
     def __init__(self,
                  trainer,
                  tokenizer,
@@ -39,6 +39,6 @@ class AMSample:
             for i in range(len(detok_outputs)):
                 sample = {"source": self.tokenizer.decode(test_dataset["input_ids"][i]),
                           "target": detok_outputs[i],
-                          "real": self.tokenizer.deocde(test_dataset["labels"][i])
+                          "real": self.tokenizer.decode(test_dataset["labels"][i])
                           }
                 json.dump(sample, f, indent=4, ensure_ascii=False)
