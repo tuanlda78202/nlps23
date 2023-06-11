@@ -20,15 +20,15 @@ dataset:
   type: VNPDataset
 
   args:
-    tokenizer_name: "t5"
+    tokenizer_name: "gpt2"
     valid_size: 0.1
     test_size: 0.1
-    model_architecture: "encoder_decoder"
+    model_architecture: "decoder"
     max_title_length: -1
     max_format_length: -1
     max_sentence_length: -1
-    max_source_length: 42
-    max_target_length: 384
+    max_source_length: 384
+    max_target_length: 0
     with_title: True
     with_format: True
     with_1st_sentence: True
@@ -140,6 +140,7 @@ evaluation:
 
   args:
     save_sample_dir: "gpt2_first"
+    per_device_eval_batch_size: 4
     do_sample: True
     max_length: 100
     repetition_penalty: 20.0

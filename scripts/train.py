@@ -54,7 +54,7 @@ def main(config):
     #
     # model = model.to(device)
     if model_name == "gpt2":
-        model = GPT2LMHeadModel.from_pretrained('NlpHUST/gpt2-vietnamese').cuda()
+        model = GPT2LMHeadModel.from_pretrained('NlpHUST/gpt2-vietnamese')
         model.resize_token_embeddings(len(tokenizer))
     elif model_name == "t5":
         model = AutoModelForSeq2SeqLM.from_pretrained("VietAI/vit5-base")
