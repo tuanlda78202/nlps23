@@ -57,11 +57,11 @@ class ARSample:
 
             for i in range(len(detok_outputs)):
                 source = self.tokenizer.decode(test_dataset["input_ids"][:i + self.per_device_eval_batch_size][i])
-                real = test_dataset["labels"][:i + self.per_device_eval_batch_size][i]
+                real = self.tokenizer.decode(test_dataset["labels"][:i + self.per_device_eval_batch_size][i])
                 samples["source"].append(source),
                 samples["target"].append(detok_outputs[i])
                 samples["real"].append(
-                    self.tokenizer.decode(real)
+
                 )
                 samples["complete_predict"].append(source+detok_outputs[i])
                 samples["complete_actual"].append(real+detok_outputs[i])
