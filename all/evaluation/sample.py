@@ -1,7 +1,7 @@
 import torch
 import os
 import json
-
+from metrics import *
 
 class ARSample:
     def __init__(self,
@@ -28,21 +28,56 @@ class ARSample:
     def generate(self, test_dataset):
         if not os.path.exists("experiments"):
             os.mkdir("experiments")
-        for i in range(0,len(test_dataset["input_ids"]), self.per_device_eval_batch_size):
-            outputs = self.model.generate(torch.Tensor(test_dataset["input_ids"][:i + self.per_device_eval_batch_size]).squeeze().to("cuda").long(),
-                                          do_sample=self.do_sample,
-                                          max_length=self.max_length,
-                                          repetition_penalty=self.repetition_penalty,
-                                          top_k=self.top_k,
-                                          top_p=self.top_p
-                                          )
+        samples = {
+            "source": [],
+            "target": [],
+            "real": [],
+            "complete_predict": [],
+            "complete_actual": [],
+        }
+        metrics = {
+            "perplexity": None,
+            "wordcount": None,
+            "diversity": None,
+            "memorization": None,
+            "mauve": None,
+        }
+
+        for i in range(0, len(test_dataset["input_ids"]), self.per_device_eval_batch_size):
+            outputs = self.model.generate(
+                torch.Tensor(test_dataset["input_ids"][:i + self.per_device_eval_batch_size]).squeeze().to(
+                    "cuda").long(),
+                do_sample=self.do_sample,
+                max_length=self.max_length,
+                repetition_penalty=self.repetition_penalty,
+                top_k=self.top_k,
+                top_p=self.top_p
+                )
             detok_outputs = [self.tokenizer.decode(x, skip_special_tokens=True) for x in outputs]
-            with open(f"experiments/{self.save_sample_dir}", "a", encoding="utf-8") as f:
-                for i in range(len(detok_outputs)):
-                    sample = {"source": self.tokenizer.decode(test_dataset["input_ids"][:i+self.per_device_eval_batch_size][i]),
-                              "target": detok_outputs[i],
-                              "real": self.tokenizer.decode(test_dataset["labels"][:i+self.per_device_eval_batch_size][i])
-                              }
-                    json_string = json.dumps(sample, ensure_ascii=False).encode('utf8').decode('utf8')
-                    f.write(json_string)
-                    # json.dump(sample, f, indent=4, ensure_ascii=False).encode("utf8")
+
+            for i in range(len(detok_outputs)):
+                source = self.tokenizer.decode(test_dataset["input_ids"][:i + self.per_device_eval_batch_size][i])
+                real = test_dataset["labels"][:i + self.per_device_eval_batch_size][i]
+                samples["source"].append(source),
+                samples["target"].append(detok_outputs[i])
+                samples["real"].append(
+                    self.tokenizer.decode(real)
+                )
+                samples["complete_predict"].append(source+detok_outputs[i])
+                samples["complete_actual"].append(real+detok_outputs[i])
+                # json.dump(sample, f, indent=4, ensure_ascii=False).encode("utf8")
+
+        with open(f"experiments/{self.save_sample_dir}", "w", encoding="utf-8") as f:
+            json_string = json.dumps(samples, ensure_ascii=False, indent=4)
+            f.write(json_string)
+
+        metrics["perplexity"] = compute_perplexity(samples["complete_predict"])
+        metrics["wordcount"] = compute_wordcount(samples["source"])
+        metrics["diversity"] = compute_diversity(samples["source"])
+        metrics["memorization"] = compute_memorization(samples["source"], samples["complete_actual"])
+        metrics["mauve"] = compute_mauve(samples["source"], samples["complete_actual"])
+
+        if not os.path.exists("experiments/metrics_eval"):
+            os.mkdir("experiments/metrics_eval")
+        with open(f"experiments/metrics_eval/{self.save_sample_dir}", "w") as f:
+            json.dump(metrics, f, indent=4)
