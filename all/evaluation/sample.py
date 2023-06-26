@@ -43,4 +43,6 @@ class ARSample:
                               "target": detok_outputs[i],
                               "real": self.tokenizer.decode(test_dataset["labels"][:i+self.per_device_eval_batch_size][i])
                               }
-                    json.dump(sample, f, indent=4, ensure_ascii=False).encode("utf8")
+                    json_string = json.dumps(sample, ensure_ascii=False).encode('utf8').decode('utf8')
+                    f.write(json_string)
+                    # json.dump(sample, f, indent=4, ensure_ascii=False).encode("utf8")
