@@ -1,5 +1,5 @@
 from all.base.base_dataloader import VNPBaseDataLoader
-from all.data import VNPDataset
+from all.data.dataset import VNPDataset
 from all.data import DataCollatorForSeq2Seq, DataCollatorForLanguageModeling
 
 
