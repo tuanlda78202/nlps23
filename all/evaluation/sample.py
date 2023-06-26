@@ -60,9 +60,7 @@ class ARSample:
                 real = self.tokenizer.decode(test_dataset["labels"][:i + self.per_device_eval_batch_size][i])
                 samples["source"].append(source),
                 samples["target"].append(detok_outputs[i])
-                samples["real"].append(
-
-                )
+                samples["real"].append(real)
                 samples["complete_predict"].append(source+detok_outputs[i])
                 samples["complete_actual"].append(real+detok_outputs[i])
                 # json.dump(sample, f, indent=4, ensure_ascii=False).encode("utf8")
