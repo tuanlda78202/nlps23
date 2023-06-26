@@ -71,7 +71,8 @@ class ARSample:
             json_string = json.dumps(samples, ensure_ascii=False, indent=4)
             f.write(json_string)
 
-        metrics["perplexity"] = compute_perplexity(samples["complete_predict"])
+        metrics["perplexity_gen"] = compute_perplexity(samples["complete_predict"])
+        metrics["perplexity_real"] = compute_perplexity(samples["complete_actual"])
         metrics["wordcount"] = compute_wordcount(samples["complete_predict"])
         metrics["diversity"] = compute_diversity(samples["complete_predict"])
         metrics["memorization"] = compute_memorization(samples["complete_predict"], samples["complete_actual"])
