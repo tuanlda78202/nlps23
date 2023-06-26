@@ -37,7 +37,7 @@ class ARSample:
                                           top_p=self.top_p
                                           )
             detok_outputs = [self.tokenizer.decode(x, skip_special_tokens=True) for x in outputs]
-            with open(f"experiments/{self.save_sample_dir}", "a") as f:
+            with open(f"experiments/{self.save_sample_dir}", "a", encoding="utf-8") as f:
                 for i in range(len(detok_outputs)):
                     sample = {"source": self.tokenizer.decode(test_dataset["input_ids"][:i+self.per_device_eval_batch_size][i]),
                               "target": detok_outputs[i],
