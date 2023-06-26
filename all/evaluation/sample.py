@@ -56,13 +56,15 @@ class ARSample:
             detok_outputs = [self.tokenizer.decode(x, skip_special_tokens=True) for x in outputs]
 
             for i in range(len(detok_outputs)):
-                source = self.tokenizer.decode(test_dataset["input_ids"][:i + self.per_device_eval_batch_size][i])
-                real = self.tokenizer.decode(test_dataset["labels"][:i + self.per_device_eval_batch_size][i])
+                source = self.tokenizer.decode(test_dataset["input_ids"][:i + self.per_device_eval_batch_size][i],
+                                               skip_special_tokens=True)
+                real = self.tokenizer.decode(test_dataset["labels"][:i + self.per_device_eval_batch_size][i],
+                                             skip_special_tokens=True)
                 samples["source"].append(source),
                 samples["target"].append(detok_outputs[i])
                 samples["real"].append(real)
-                samples["complete_predict"].append(source+detok_outputs[i])
-                samples["complete_actual"].append(real+detok_outputs[i])
+                samples["complete_predict"].append(source.split(self.tokenizer.eos_token)[-1]+detok_outputs[i])
+                samples["complete_actual"].append(source.split(self.tokenizer.eos_token)[-1]+real)
                 # json.dump(sample, f, indent=4, ensure_ascii=False).encode("utf8")
 
         with open(f"experiments/{self.save_sample_dir}", "w", encoding="utf-8") as f:
@@ -70,10 +72,10 @@ class ARSample:
             f.write(json_string)
 
         metrics["perplexity"] = compute_perplexity(samples["complete_predict"])
-        metrics["wordcount"] = compute_wordcount(samples["source"])
-        metrics["diversity"] = compute_diversity(samples["source"])
-        metrics["memorization"] = compute_memorization(samples["source"], samples["complete_actual"])
-        metrics["mauve"] = compute_mauve(samples["source"], samples["complete_actual"])
+        metrics["wordcount"] = compute_wordcount(samples["complete_predict"])
+        metrics["diversity"] = compute_diversity(samples["complete_predict"])
+        metrics["memorization"] = compute_memorization(samples["complete_predict"], samples["complete_actual"])
+        metrics["mauve"] = compute_mauve(samples["complete_predict"], samples["complete_actual"])
 
         if not os.path.exists("experiments/metrics_eval"):
             os.mkdir("experiments/metrics_eval")
