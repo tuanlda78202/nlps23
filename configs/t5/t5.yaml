@@ -105,7 +105,7 @@ training_arguments:
     adam_beta1: 0.9
     adam_beta2: 0.999
     adam_epsilon: 0.00000001
-    num_train_epochs: 3
+    num_train_epochs: 2
     lr_scheduler_type: "linear"  # linear / cosine / cosine_with_restarts / polynomial / constant / constant_with_warmup / inverse_sqrt / reduce_lr_on_plateau
     warmup_steps: 1000
     warmup_ratio: 0.05
