@@ -144,6 +144,7 @@ evaluation:
 
   args:
     save_sample_dir: "t5_first"
+    per_device_eval_batch_size: 8
     do_sample: True
     max_length: 100
     repetition_penalty: 20.0
