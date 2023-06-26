@@ -143,7 +143,7 @@ evaluation:
   type: ARSample
 
   args:
-    save_sample_dir: "t5_first"
+    save_sample_dir: "t5_first.txt"
     per_device_eval_batch_size: 8
     do_sample: True
     max_length: 100
