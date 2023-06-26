@@ -315,7 +315,7 @@ class VNPDataset:
             padding="max_length",
             truncation=True,
             max_length=self.max_source_length,
-            return_tensors="pt",
+            return_tensors="np",
         )
 
         if self.model_architecture == "encoder_decoder":
@@ -325,7 +325,7 @@ class VNPDataset:
                     max_length=self.max_target_length,
                     truncation=True,
                     padding="max_length",
-                    return_tensors="pt",
+                    return_tensors="np",
                 )["input_ids"]
         else:
             model_inputs["labels"] = model_inputs["input_ids"]
