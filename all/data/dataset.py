@@ -161,7 +161,7 @@ class VNPDataset:
         )
         dataset["train"], dataset["valid"] = (
             dataset["train"]
-                .train_test_split(test_size=self.valid_size / (1 - self.test_size), seed=42)
+                .train_test_split(test_size=self.valid_size, seed=42)
                 .values()
         )
 
