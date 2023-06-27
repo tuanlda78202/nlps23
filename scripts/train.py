@@ -85,7 +85,7 @@ def main(config):
     trainer.train()
 
     test_samples = config.init_ftn("evaluation", module_eval)
-    test_samples = test_samples(tokenizer=tokenizer, trainer=trainer)
+    test_samples = test_samples(tokenizer=tokenizer, tokenizer_name=tokenizer_name, trainer=trainer)
     test_samples.generate(test_dataset=test_dataset)
 
 
