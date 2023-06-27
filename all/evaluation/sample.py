@@ -86,5 +86,5 @@ class ARSample:
 
         if not os.path.exists("experiments/metrics_eval"):
             os.mkdir("experiments/metrics_eval")
-        with open(f"experiments/metrics_eval/{self.save_sample_dir}", "w") as f:
+        with open(f"experiments/metrics_eval/{self.save_sample_dir}_results", "w") as f:
             json.dump(metrics, f, indent=4)
