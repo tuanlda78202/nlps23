@@ -16,6 +16,26 @@ dataloader:
   dtype: 'bfloat16' # 'float32', 'bfloat16', or 'float16', the latter will auto implement a GradScaler
   compile: True # use PyTorch 2.0 to compile the model to be faster
 
+dataset:
+  type: VNPDataset
+
+  args:
+    tokenizer_name: "gpt2"
+    valid_size: 0.1
+    test_size: 0.1
+    model_architecture: "decoder"
+    max_title_length: -1
+    max_format_length: -1
+    max_sentence_length: -1
+    max_source_length: 42
+    max_target_length: 384
+    with_title: True
+    with_format: True
+    with_1st_sentence: True
+    with_2nd_sentence: False
+    is_augment: True
+    dataset_name: "Libosa2707/vietnamese-poem"
+
 
 arch: 
   type: GPT2

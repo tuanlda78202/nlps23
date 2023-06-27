@@ -1,2 +1,2 @@
-from .log import *
-from .util import *
+from utils.log import *
+from utils.util import *

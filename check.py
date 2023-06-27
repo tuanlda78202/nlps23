@@ -1,4 +1,4 @@
-from all.data.dataloader import VNPDataLoader
+from all.data import VNPDataLoader
 from transformers import AutoTokenizer
 from tqdm import tqdm
 

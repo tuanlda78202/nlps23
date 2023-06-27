@@ -1,1 +1,1 @@
-from .parse_config import *
+from configs.parse_config import *

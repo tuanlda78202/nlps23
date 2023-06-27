@@ -1,0 +1,154 @@
+
+name: VietnamesePoem-GPT2-220M
+
+device: "cuda"
+
+dataloader:
+  type: VNPDataLoader
+
+  args:
+    batch_size: 4 # if gradient_accumulation_steps > 1, this is the micro-batch size
+    device: 'cuda'
+    num_workers: 4
+
+  gradient_accumulation_steps: 5 * 1 # used to simulate larger batch sizes
+  block_size: 320
+  dtype: 'bfloat16' # 'float32', 'bfloat16', or 'float16', the latter will auto implement a GradScaler
+  compile: True # use PyTorch 2.0 to compile the model to be faster
+
+dataset:
+  type: VNPDataset
+
+  args:
+    tokenizer_name: "gpt2"
+    valid_size: 1000
+    test_size: 1000
+    model_architecture: "decoder"
+    max_title_length: -1
+    max_format_length: -1
+    max_sentence_length: -1
+    max_source_length: 384
+    max_target_length: 0
+    with_title: True
+    with_format: True
+    with_1st_sentence: True
+    with_2nd_sentence: False
+    is_augment: True
+    dataset_name: "Libosa2707/vietnamese-poem"
+
+collator:
+  type: DataCollatorForLanguageModeling
+
+  args:
+    mlm: False
+
+
+#arch:
+#  type: GPT2
+#
+#  args:
+#    block_size: 320
+#    vocab_size: 40031
+#    n_layer: 12
+#    n_head: 12
+#    n_embd: 768
+#    dropout: 0.0 # for pre-training 0 is good, for finetuning try 0.1+
+#    bias: False # do we use bias inside LayerNorm and Linear layers?
+
+
+optimizer:
+  type: AdamW
+
+  args:
+    learning_rate: 6e-4 # max learning rate
+    max_iters: 600000 # total number of training iterations
+    weight_decay: 1e-1
+    beta1: 0.9
+    beta2: 0.95
+    grad_clip: 1.0 # clip gradients at this value, or disable if := 0.0
+
+  type: LRDecay
+
+  args:
+    decay_lr: True # whether to decay the learning rate
+    warmup_iters: 2000 # how many steps to warm up for
+    lr_decay_iters: 600000 # should be ~=  max_iters per Chinchilla
+    min_lr: 6e-5 # minimum learning rate, should be ~=  learning_rate/10 per Chinchilla
+
+
+eval:
+  eval_interval: 2000
+  eval_iters: 200
+  log_interval: 10
+  eval_only: False # if True, script exits right after the first eval
+  always_save_checkpoint: True # if True, always save a checkpoint after each eval
+  init_from: 'scratch' # 'scratch' or 'resume' or 'gpt2*'
+
+init_from: "scratch"
+
+training_arguments:
+  type: TrainingArguments
+
+  args:
+    output_dir: "experiments/"
+    overwrite_output_dir: True
+    per_device_train_batch_size: 4
+    per_device_eval_batch_size: 4
+
+    # optimizer, lr scheduler and warm-up step
+    learning_rate: 0.00002
+    weight_decay: 0
+    adam_beta1: 0.9
+    adam_beta2: 0.999
+    adam_epsilon: 0.00000001
+    num_train_epochs: 2
+    lr_scheduler_type: "linear"  # linear / cosine / cosine_with_restarts / polynomial / constant / constant_with_warmup / inverse_sqrt / reduce_lr_on_plateau
+    warmup_steps: 1000
+    warmup_ratio: 0.05
+    # logging
+    logging_steps: 100
+
+    # save checkpoint
+    save_strategy: "steps"  # "no" / "epoch"
+    save_steps: 1000
+    save_total_limit: 1
+
+    # quantization
+    fp16: False
+
+    report_to: "wandb"
+
+trainer:
+  type: Trainer
+
+  compile: True # use PyTorch 2.0 to compile the model to be faster
+
+  epochs: 1000
+  save_dir: saved/
+  save_period: 10
+  verbosity: 1
+
+  visual_tool: wandb
+  project: nlps23
+
+  api_key_file: ./configs/api/tuanlda78202
+  entity: tuanlda78202
+
+
+evaluation:
+  type: ARSample
+
+  args:
+    save_sample_dir: "gpt2_first"
+    per_device_eval_batch_size: 4
+    do_sample: True
+    max_length: 100
+    repetition_penalty: 20.0
+    top_k: 50
+    top_p: 0.92
+
+logger:
+  type: wandb
+
+  args:
+    name: "first_t5_5epochs"

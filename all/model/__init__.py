@@ -1,3 +1,3 @@
-from .gpt2 import *
-from .hmm import *
-from .ld4lg import *
+from all.model.gpt2 import *
+from all.model.hmm import *
+from all.model.ld4lg import *
