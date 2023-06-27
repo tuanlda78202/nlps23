@@ -2,6 +2,7 @@ import sys
 import os
 import warnings
 import gc
+import wandb
 
 
 sys.path.append(os.getcwd())
@@ -35,6 +36,8 @@ model_name = "t5"
 
 def main(config):
     logger = config.get_logger("train")
+    wandb.login(key="6d7164c6b59114edd8eb2a3fdd41a38b64c5d800")
+
 
     tokenizer_name = config['dataset']['args']['tokenizer_name']
     tokenizer = util.get_tokenizer(tokenizer_name=tokenizer_name)

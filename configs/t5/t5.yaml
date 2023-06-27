@@ -111,7 +111,6 @@ training_arguments:
     warmup_ratio: 0.05
     # logging
     logging_steps: 100
-
     # save checkpoint
     save_strategy: "steps"  # "no" / "epoch"
     save_steps: 1000
