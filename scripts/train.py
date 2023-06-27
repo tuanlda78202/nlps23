@@ -74,6 +74,8 @@ def main(config):
     data_collator = data_collator(model=model, tokenizer=tokenizer)
 
     training_args = config.init_obj("training_arguments", transformers)
+    # Initialize a new run with wandb
+    wandb.init(name=config["logger"]["args"]["name"], dir='.')
 
     trainer = getattr(transformers, config['trainer']['type'])(model=model,
                                                                args=training_args,
