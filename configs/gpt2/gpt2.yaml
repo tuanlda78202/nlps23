@@ -108,6 +108,9 @@ training_arguments:
     # logging
     logging_steps: 100
 
+    # evaluation
+    evaluation_strategy: "epoch"
+
     # save checkpoint
     save_strategy: "steps"  # "no" / "epoch"
     save_steps: 1000
