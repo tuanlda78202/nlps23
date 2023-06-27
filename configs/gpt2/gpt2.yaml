@@ -21,8 +21,8 @@ dataset:
 
   args:
     tokenizer_name: "gpt2"
-    valid_size: 0.1
-    test_size: 0.1
+    valid_size: 1000
+    test_size: 1000
     model_architecture: "decoder"
     max_title_length: -1
     max_format_length: -1
@@ -33,7 +33,7 @@ dataset:
     with_format: True
     with_1st_sentence: True
     with_2nd_sentence: False
-    is_augment: False
+    is_augment: True
     dataset_name: "Libosa2707/vietnamese-poem"
 
 collator:
@@ -101,7 +101,7 @@ training_arguments:
     adam_beta1: 0.9
     adam_beta2: 0.999
     adam_epsilon: 0.00000001
-    num_train_epochs: 3
+    num_train_epochs: 2
     lr_scheduler_type: "linear"  # linear / cosine / cosine_with_restarts / polynomial / constant / constant_with_warmup / inverse_sqrt / reduce_lr_on_plateau
     warmup_steps: 1000
     warmup_ratio: 0.05
