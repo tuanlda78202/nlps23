@@ -38,7 +38,8 @@ class ARSample:
             "complete_actual": [],
         }
         metrics = {
-            "perplexity": None,
+            "perplexity_gen": None,
+            "perplexity_real": None,
             "wordcount": None,
             "diversity": None,
             "memorization": None,
