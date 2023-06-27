@@ -75,6 +75,7 @@ def main(config):
 
     training_args = config.init_obj("training_arguments", transformers)
     # Initialize a new run with wandb
+    print("HIIIIIIIIIIIIIIIIIII", config["logger"]["args"]["name"])
     wandb.init(name=config["logger"]["args"]["name"], dir='.')
 
     trainer = getattr(transformers, config['trainer']['type'])(model=model,

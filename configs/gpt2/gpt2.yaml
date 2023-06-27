@@ -146,3 +146,9 @@ evaluation:
     repetition_penalty: 20.0
     top_k: 50
     top_p: 0.92
+
+logger:
+  type: wandb
+
+  args:
+    name: "first_t5_5epochs"
