@@ -34,7 +34,7 @@ dataset:
     with_1st_sentence: True
     with_2nd_sentence: False
     is_augment: False
-    dataset_name: "Libosa2707/vietnamese-poem"
+    dataset_name: "phamson02/vietnamese-poetry-corpus"
 
 collator:
   type: DataCollatorForSeq2Seq
