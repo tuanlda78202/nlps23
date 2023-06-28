@@ -22,7 +22,7 @@ dataset:
   args:
     tokenizer_name: "gpt2"
     valid_size: 1000
-    test_size: 1000
+    test_size: 150
     model_architecture: "decoder"
     max_title_length: -1
     max_format_length: -1
@@ -34,7 +34,7 @@ dataset:
     with_1st_sentence: True
     with_2nd_sentence: False
     is_augment: True
-    dataset_name: "Libosa2707/vietnamese-poem"
+    dataset_name: "phamson02/vietnamese-poetry-corpus"
 
 collator:
   type: DataCollatorForLanguageModeling
@@ -154,4 +154,4 @@ logger:
   type: wandb
 
   args:
-    name: "first_t5_5epochs"
+    name: "first_gpt2_5epochs"

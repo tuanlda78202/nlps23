@@ -1,7 +1,7 @@
 from datasets import load_dataset
 from all.base.base_dataset import VNPBaseDataset
 from transformers import PreTrainedTokenizerBase
-import underthesea
+from underthesea import word_tokenize
 
 
 class VNPDataset:
@@ -11,7 +11,7 @@ class VNPDataset:
             tokenizer: PreTrainedTokenizerBase,
             tokenizer_name,
             model_architecture="decoder",
-            dataset_name="Libosa2707/vietnamese-poem",
+            dataset_name="phamson02/vietnamese-poetry-corpus",
             valid_size=0.1,
             test_size=0.1,
             max_title_length=-1,
@@ -171,22 +171,25 @@ class VNPDataset:
         """Strip and remove space"""
 
         def process_poem_text(examples):
-            texts = [
-                PreTrainedTokenizerBase.clean_up_tokenization(example.strip())
-                for example in examples["content"]
-            ]
-            genres = [
-                PreTrainedTokenizerBase.clean_up_tokenization(example.strip())
-                if example is not None
-                else self.tokenizer.unk_token
-                for example in examples["genre"]
-            ]
-            titles = [
-                " ".join(underthesea.word_tokenize(example.strip().lower()))
-                if example is not None
-                else self.tokenizer.unk_token
-                for example in examples["title"]
-            ]
+            texts = []
+            genres = []
+            titles = []
+            for example in examples["content"]:
+                if example is not None:
+                    texts.append(
+                        " ".join(word_tokenize("+".join(example.split("\n")))).replace("+", "<\n>")
+                    )
+            for example in examples["genre"]:
+                if example is not None:
+                    genres.append(
+                        " ".join(word_tokenize(example))
+                    )
+            for example in examples["title"]:
+                if example is not None:
+                    titles.append(
+                        " ".join(word_tokenize(example)).lower()
+                    )
+
             return {"text": texts, "genre": genres, "title": titles}
 
         dataset = ds.map(
@@ -194,7 +197,7 @@ class VNPDataset:
             batched=True,
             num_proc=4,
             load_from_cache_file=True,
-            remove_columns=["id", "content", "title", "url", "genre"],
+            remove_columns=["period", "content", "title", "url", "genre", "specific_genre", "author"],
         )
         return dataset
 
