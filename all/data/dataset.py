@@ -171,26 +171,7 @@ class VNPDataset:
         """Strip and remove space"""
 
         def process_poem_text(examples):
-            texts = []
-            genres = []
-            titles = []
-            for example in examples["content"]:
-                if example is not None:
-                    texts.append(
-                        " ".join(word_tokenize("+".join(example.split("\n")))).replace("+", "<\n>")
-                    )
-            for example in examples["genre"]:
-                if example is not None:
-                    genres.append(
-                        example
-                    )
-            for example in examples["title"]:
-                if example is not None:
-                    titles.append(
-                        example.lower()
-                    )
-
-            return {"text": texts, "genre": genres, "title": titles}
+            return {"text": examples["content"], "genre": examples["genre"], "title": examples["title"]}
 
         dataset = ds.map(
             process_poem_text,
@@ -208,59 +189,65 @@ class VNPDataset:
             if self.with_format:  # with "thể thơ"
                 if self.with_1st_sentence:                                  # tiêu đề: <tiêu đề> <eos> thể thơ: <thể thơ> <eos> <sent_1> <\n>
                     for idx in range(len(examples["text"])):                # || <sent_2...n>
-                        texts.append(
-                            "làm thơ với tiêu đề: "
-                            + examples["title"][idx]
-                            + self.tokenizer.eos_token
-                            + "thể thơ: "
-                            + examples["genre"][idx]
-                            + self.tokenizer.eos_token
-                            + examples["text"][idx].split("\n")[0]
-                            + "<\n>"
-                        )
-                        labels.append(
-                            "<\n>".join(examples["text"][idx].split("\n")[1:])
-                        )
+                        if (examples["title"][idx] != self.tokenizer.unk_token
+                                and examples["genre"][idx] != self.tokenizer.unk_token):
+                            texts.append(
+                                "làm thơ với tiêu đề: "
+                                + examples["title"][idx]
+                                + self.tokenizer.eos_token
+                                + "thể thơ: "
+                                + examples["genre"][idx]
+                                + self.tokenizer.eos_token
+                                + examples["text"][idx].split("\n")[0]
+                                + "<\n>"
+                            )
+                            labels.append(
+                                "<\n>".join(examples["text"][idx].split("\n")[1:])
+                            )
                 if self.with_2nd_sentence:                                  # tiêu đề: <tiêu đề> <eos> thể thơ: <thể thơ> <eos> <sent_1> <\n> <sent_2> <\n>
                     for idx in range(len(examples["text"])):                # || <sent_3...n>
-                        texts.append(
-                            "làm thơ với tiêu đề: "
-                            + examples["title"][idx]
-                            + self.tokenizer.eos_token
-                            + "thể thơ: "
-                            + examples["genre"][idx]
-                            + self.tokenizer.eos_token
-                            + "<\n>".join(examples["text"][idx].split("\n")[:2])
-                            + "<\n>"
-                        )
-                        labels.append(
-                            "<\n>".join(examples["text"][idx].split("\n")[2:])
-                        )
+                        if (examples["title"][idx] != self.tokenizer.unk_token
+                                and examples["genre"][idx] != self.tokenizer.unk_token):
+                            texts.append(
+                                "làm thơ với tiêu đề: "
+                                + examples["title"][idx]
+                                + self.tokenizer.eos_token
+                                + "thể thơ: "
+                                + examples["genre"][idx]
+                                + self.tokenizer.eos_token
+                                + "<\n>".join(examples["text"][idx].split("\n")[:2])
+                                + "<\n>"
+                            )
+                            labels.append(
+                                "<\n>".join(examples["text"][idx].split("\n")[2:])
+                            )
 
         else:  # without title
             if self.with_format:  # with "thể thơ"
                 if self.with_1st_sentence:                                  # thể thơ: <thể thơ> <eos> <sent_1> <\n>
                     for idx in range(len(examples["text"])):                # || <sent_2...n>
-                        texts.append(
-                            "làm thơ với thể thơ: " + examples["genre"][idx]
-                            + self.tokenizer.eos_token
-                            + examples["text"][idx].split("<\n>")[0]
-                            + "<\n>"
-                        )
-                        labels.append(
-                            "<\n>".join(examples["text"][idx].split("<\n>")[1:])
-                        )
+                        if examples["genre"][idx] != self.tokenizer.unk_token:
+                            texts.append(
+                                "làm thơ với thể thơ: " + examples["genre"][idx]
+                                + self.tokenizer.eos_token
+                                + examples["text"][idx].split("<\n>")[0]
+                                + "<\n>"
+                            )
+                            labels.append(
+                                "<\n>".join(examples["text"][idx].split("<\n>")[1:])
+                            )
                 if self.with_2nd_sentence:                                  # thể thơ: <thể thơ> <eos> <sent_1> <\n> <sent_2> <\n>
                     for idx in range(len(examples["text"])):                # || <sent_3...n>
-                        texts.append(
-                            "làm thơ với thể thơ: " + examples["genre"][idx]
-                            + self.tokenizer.eos_token
-                            + "<\n>".join(examples["text"][idx].split("<\n>")[:2])
-                            + "<\n>"
-                        )
-                        labels.append(
-                            "<\n>".join(examples["text"][idx].split("<\n>")[2:])
-                        )
+                        if examples["genre"][idx] != self.tokenizer.unk_token:
+                            texts.append(
+                                "làm thơ với thể thơ: " + examples["genre"][idx]
+                                + self.tokenizer.eos_token
+                                + "<\n>".join(examples["text"][idx].split("<\n>")[:2])
+                                + "<\n>"
+                            )
+                            labels.append(
+                                "<\n>".join(examples["text"][idx].split("<\n>")[2:])
+                            )
 
         if self.is_augment:
             if self.model_architecture == "decoder":  # <sent_1> <\n> <sent_2> <\n> || <sent_3...n>
@@ -275,26 +262,28 @@ class VNPDataset:
             elif self.model_architecture == "encoder_decoder":
                 if self.with_1st_sentence:                              # thể thơ: <thể thơ> <eos> <sent_1> <\n> <sent_2> <\n>  || <sent_2...n>
                     for idx in range(len(examples["text"])):
-                        texts.append(
-                            "làm thơ với thể thơ: " + examples["genre"][idx]
-                            + self.tokenizer.eos_token
-                            + "<\n>".join(examples["text"][idx].split("\n")[:2])
-                            + "<\n>"
-                        )
-                        labels.append(
-                            "<\n>".join(examples["text"][idx].split("\n")[2:])
-                        )
+                        if examples["genre"][idx] != self.tokenizer.unk_token:
+                            texts.append(
+                                "làm thơ với thể thơ: " + examples["genre"][idx]
+                                + self.tokenizer.eos_token
+                                + "<\n>".join(examples["text"][idx].split("\n")[:2])
+                                + "<\n>"
+                            )
+                            labels.append(
+                                "<\n>".join(examples["text"][idx].split("\n")[2:])
+                            )
                 if self.with_2nd_sentence:                              # thể thơ: <thể thơ> <eos> <sent_1> <\n> || <sent_2...n>
                     for idx in range(len(examples["text"])):
-                        texts.append(
-                            "làm thơ với thể thơ: " + examples["genre"][idx]
-                            + self.tokenizer.eos_token
-                            + examples["text"][idx].split("\n")[0]
-                            + "<\n>"
-                        )
-                        labels.append(
-                            "<\n>".join(examples["text"][idx].split("\n")[1:])
-                        )
+                        if examples["genre"][idx] != self.tokenizer.unk_token:
+                            texts.append(
+                                "làm thơ với thể thơ: " + examples["genre"][idx]
+                                + self.tokenizer.eos_token
+                                + examples["text"][idx].split("\n")[0]
+                                + "<\n>"
+                            )
+                            labels.append(
+                                "<\n>".join(examples["text"][idx].split("\n")[1:])
+                            )
         # in case batch has no data
         if len(texts) == 0:
             texts = ["<\n>".join(examples["text"][0].split("\n")[:2])
