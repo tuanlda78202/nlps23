@@ -176,13 +176,13 @@ class VNPDataset:
                 for example in examples["content"]
             ]
             genres = [
-                " ".join(word_tokenize("+".join(example.split("\n")))).replace("+", "<\n>")
+                " ".join(word_tokenize(example))
                 if example is not None
                 else self.tokenizer.unk_token
                 for example in examples["genre"]
             ]
             titles = [
-                " ".join(word_tokenize("+".join(example.split("\n")))).replace("+", "<\n>").lower()
+                " ".join(word_tokenize(example)).lower()
                 if example is not None
                 else self.tokenizer.unk_token
                 for example in examples["title"]

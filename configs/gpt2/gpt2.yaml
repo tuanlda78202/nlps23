@@ -22,7 +22,7 @@ dataset:
   args:
     tokenizer_name: "gpt2"
     valid_size: 1000
-    test_size: 1000
+    test_size: 150
     model_architecture: "decoder"
     max_title_length: -1
     max_format_length: -1
