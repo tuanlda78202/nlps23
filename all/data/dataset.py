@@ -171,22 +171,25 @@ class VNPDataset:
         """Strip and remove space"""
 
         def process_poem_text(examples):
-            texts = [
-                " ".join(word_tokenize("+".join(example.split("\n")))).replace("+", "<\n>")
-                for example in examples["content"]
-            ]
-            genres = [
-                " ".join(word_tokenize(example))
-                if example is not None
-                else self.tokenizer.unk_token
-                for example in examples["genre"]
-            ]
-            titles = [
-                " ".join(word_tokenize(example)).lower()
-                if example is not None
-                else self.tokenizer.unk_token
-                for example in examples["title"]
-            ]
+            texts = []
+            genres = []
+            titles = []
+            for example in examples["content"]:
+                if example is not None:
+                    texts.append(
+                        " ".join(word_tokenize("+".join(example.split("\n")))).replace("+", "<\n>")
+                    )
+            for example in examples["genre"]:
+                if example is not None:
+                    genres.append(
+                        " ".join(word_tokenize(example))
+                    )
+            for example in examples["title"]:
+                if example is not None:
+                    titles.append(
+                        " ".join(word_tokenize(example)).lower()
+                    )
+
             return {"text": texts, "genre": genres, "title": titles}
 
         dataset = ds.map(
