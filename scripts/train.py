@@ -33,13 +33,14 @@ torch.backends.cuda.matmul.allow_tf32 = True
 model_name = "t5"
 
 # model_architecture = "encoder_decoder"
+os.environ["WANDB_MODE"] = "online"
+
 
 def main(config):
     logger = config.get_logger("train")
-    wandb.login(key="6d7164c6b59114edd8eb2a3fdd41a38b64c5d800")
+    wandb.login(key="ba1e55e0ea20be59a4234a5ce562c0ddeb1e0499")
 
-
-    tokenizer_name = config['dataset']['args']['tokenizer_name']
+    tokenizer_name = config["dataset"]["args"]["tokenizer_name"]
     tokenizer = util.get_tokenizer(tokenizer_name=tokenizer_name)
 
     # data_loader = config.init_obj("dataloader", module_data)
@@ -57,7 +58,7 @@ def main(config):
     #
     # model = model.to(device)
     if model_name == "gpt2":
-        model = GPT2LMHeadModel.from_pretrained('NlpHUST/gpt2-vietnamese')
+        model = GPT2LMHeadModel.from_pretrained("NlpHUST/gpt2-vietnamese")
         model.resize_token_embeddings(len(tokenizer))
     elif model_name == "t5":
         model = AutoModelForSeq2SeqLM.from_pretrained("VietAI/vit5-base")
@@ -75,24 +76,29 @@ def main(config):
 
     training_args = config.init_obj("training_arguments", transformers)
     # Initialize a new run with wandb
-    print("HIIIIIIIIIIIIIIIIIII", config["logger"]["args"]["name"])
-    wandb.init(name=config["logger"]["args"]["name"], dir='.')
 
-    trainer = getattr(transformers, config['trainer']['type'])(model=model,
-                                                               args=training_args,
-                                                               data_collator=data_collator,
-                                                               train_dataset=train_dataset,
-                                                               eval_dataset=valid_dataset,
-                                                               tokenizer=tokenizer,
-                                                               # compute_metrics=compute_metrics,
-                                                               # optimizer=optimizer,
-                                                               )
+    wandb.init(name=config["logger"]["args"]["name"], dir=".")
+
+    trainer = getattr(transformers, config["trainer"]["type"])(
+        model=model,
+        args=training_args,
+        data_collator=data_collator,
+        train_dataset=train_dataset,
+        eval_dataset=valid_dataset,
+        tokenizer=tokenizer,
+        # compute_metrics=compute_metrics,
+        # optimizer=optimizer,
+    )
 
     trainer.train()
 
     test_samples = config.init_ftn("evaluation", module_eval)
-    test_samples = test_samples(tokenizer=tokenizer, tokenizer_name=tokenizer_name, trainer=trainer)
+    test_samples = test_samples(
+        tokenizer=tokenizer, tokenizer_name=tokenizer_name, trainer=trainer
+    )
     test_samples.generate(test_dataset=test_dataset)
+
+    wandb.finish()
 
 
 if __name__ == "__main__":
