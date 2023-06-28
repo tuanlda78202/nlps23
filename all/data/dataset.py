@@ -189,8 +189,8 @@ class VNPDataset:
             if self.with_format:  # with "thể thơ"
                 if self.with_1st_sentence:                                  # tiêu đề: <tiêu đề> <eos> thể thơ: <thể thơ> <eos> <sent_1> <\n>
                     for idx in range(len(examples["text"])):                # || <sent_2...n>
-                        if (examples["title"][idx] != self.tokenizer.unk_token
-                                and examples["genre"][idx] != self.tokenizer.unk_token):
+                        if (examples["title"][idx] is not None
+                                and examples["genre"][idx] is not None):
                             texts.append(
                                 "làm thơ với tiêu đề: "
                                 + examples["title"][idx]
@@ -206,8 +206,8 @@ class VNPDataset:
                             )
                 if self.with_2nd_sentence:                                  # tiêu đề: <tiêu đề> <eos> thể thơ: <thể thơ> <eos> <sent_1> <\n> <sent_2> <\n>
                     for idx in range(len(examples["text"])):                # || <sent_3...n>
-                        if (examples["title"][idx] != self.tokenizer.unk_token
-                                and examples["genre"][idx] != self.tokenizer.unk_token):
+                        if (examples["title"][idx] is not None
+                                and examples["genre"][idx] is not None):
                             texts.append(
                                 "làm thơ với tiêu đề: "
                                 + examples["title"][idx]
@@ -226,7 +226,7 @@ class VNPDataset:
             if self.with_format:  # with "thể thơ"
                 if self.with_1st_sentence:                                  # thể thơ: <thể thơ> <eos> <sent_1> <\n>
                     for idx in range(len(examples["text"])):                # || <sent_2...n>
-                        if examples["genre"][idx] != self.tokenizer.unk_token:
+                        if examples["genre"][idx] is not None:
                             texts.append(
                                 "làm thơ với thể thơ: " + examples["genre"][idx]
                                 + self.tokenizer.eos_token
@@ -238,7 +238,7 @@ class VNPDataset:
                             )
                 if self.with_2nd_sentence:                                  # thể thơ: <thể thơ> <eos> <sent_1> <\n> <sent_2> <\n>
                     for idx in range(len(examples["text"])):                # || <sent_3...n>
-                        if examples["genre"][idx] != self.tokenizer.unk_token:
+                        if examples["genre"][idx] is not None:
                             texts.append(
                                 "làm thơ với thể thơ: " + examples["genre"][idx]
                                 + self.tokenizer.eos_token
@@ -262,7 +262,7 @@ class VNPDataset:
             elif self.model_architecture == "encoder_decoder":
                 if self.with_1st_sentence:                              # thể thơ: <thể thơ> <eos> <sent_1> <\n> <sent_2> <\n>  || <sent_2...n>
                     for idx in range(len(examples["text"])):
-                        if examples["genre"][idx] != self.tokenizer.unk_token:
+                        if examples["genre"][idx] is not None:
                             texts.append(
                                 "làm thơ với thể thơ: " + examples["genre"][idx]
                                 + self.tokenizer.eos_token
@@ -274,7 +274,7 @@ class VNPDataset:
                             )
                 if self.with_2nd_sentence:                              # thể thơ: <thể thơ> <eos> <sent_1> <\n> || <sent_2...n>
                     for idx in range(len(examples["text"])):
-                        if examples["genre"][idx] != self.tokenizer.unk_token:
+                        if examples["genre"][idx] is not None:
                             texts.append(
                                 "làm thơ với thể thơ: " + examples["genre"][idx]
                                 + self.tokenizer.eos_token
