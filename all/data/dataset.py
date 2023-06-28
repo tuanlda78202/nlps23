@@ -182,12 +182,12 @@ class VNPDataset:
             for example in examples["genre"]:
                 if example is not None:
                     genres.append(
-                        " ".join(word_tokenize(example))
+                        example
                     )
             for example in examples["title"]:
                 if example is not None:
                     titles.append(
-                        " ".join(word_tokenize(example)).lower()
+                        example.lower()
                     )
 
             return {"text": texts, "genre": genres, "title": titles}
