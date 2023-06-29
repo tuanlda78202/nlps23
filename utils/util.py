@@ -107,7 +107,7 @@ def get_tokenizer(tokenizer_name) -> PreTrainedTokenizerBase:
         tokenizer.add_special_tokens({"pad_token": "[PAD]"})
     elif tokenizer_name == "t5":
         # only add eos at the end, eos || unk || pad differ id, no bos, no <\n>
-        tokenizer = AutoTokenizer.from_pretrained("VietAI/vit5-base")
+        tokenizer = AutoTokenizer.from_pretrained("VietAI/vit5-large-vietnews-summarization")
     else:
         assert Exception(f"Tokenizer {tokenizer_name} is not exist.")
 

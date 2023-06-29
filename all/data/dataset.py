@@ -222,6 +222,21 @@ class VNPDataset:
                                 "<\n>".join(examples["text"][idx].split("\n")[2:])
                             )
 
+                for idx in range(len(examples["text"])):                    # thể thơ: <thể thơ> <eos> tiêu đề: <tiêu đề>
+                    if (examples["title"][idx] is not None
+                            and examples["genre"][idx] is not None):
+                        texts.append(
+                            f"làm thơ {self.tokenizer.eos_token} thể thơ: "
+                            + examples["genre"][idx]
+                            + self.tokenizer.eos_token
+                            + "tiêu đề: "
+                            + examples["title"][idx]
+
+                        )
+                        labels.append(
+                            "<\n>".join(examples["text"][idx].split("\n"))
+                        )
+
         else:  # without title
             if self.with_format:  # with "thể thơ"
                 if self.with_1st_sentence:                                  # thể thơ: <thể thơ> <eos> <sent_1> <\n>
@@ -248,6 +263,7 @@ class VNPDataset:
                             labels.append(
                                 "<\n>".join(examples["text"][idx].split("<\n>")[2:])
                             )
+
 
         if self.is_augment:
             if self.model_architecture == "decoder":  # <sent_1> <\n> <sent_2> <\n> || <sent_3...n>

@@ -31,7 +31,7 @@ dataset:
     max_target_length: 384
     with_title: True
     with_format: True
-    with_1st_sentence: True
+    with_1st_sentence: False
     with_2nd_sentence: False
     is_augment: False
     dataset_name: "phamson02/vietnamese-poetry-corpus"
@@ -105,7 +105,7 @@ training_arguments:
     adam_beta1: 0.9
     adam_beta2: 0.999
     adam_epsilon: 0.00000001
-    num_train_epochs: 10
+    num_train_epochs: 3
     lr_scheduler_type: "linear"  # linear / cosine / cosine_with_restarts / polynomial / constant / constant_with_warmup / inverse_sqrt / reduce_lr_on_plateau
     warmup_steps: 1000
     warmup_ratio: 0.05

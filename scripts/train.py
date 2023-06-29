@@ -61,7 +61,7 @@ def main(config):
         model = GPT2LMHeadModel.from_pretrained("NlpHUST/gpt2-vietnamese")
         model.resize_token_embeddings(len(tokenizer))
     elif model_name == "t5":
-        model = AutoModelForSeq2SeqLM.from_pretrained("VietAI/vit5-base")
+        model = AutoModelForSeq2SeqLM.from_pretrained("VietAI/vit5-large-vietnews-summarization")
         model.resize_token_embeddings(len(tokenizer))
     elif model_name == "hmm":
         model = ...
