@@ -28,7 +28,7 @@ dataset:
     max_format_length: -1
     max_sentence_length: -1
     max_source_length: 42
-    max_target_length: 320
+    max_target_length: 256
     with_title: True
     with_format: True
     with_1st_sentence: False
