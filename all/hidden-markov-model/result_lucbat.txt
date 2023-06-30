@@ -1,0 +1,3 @@
+Perplexity: 3770.6680912272136
+Wordcount: 2581
+Diversity: {'2gram_repitition': 0.5112620851842173, '3gram_repitition': 0.16340503672612805, '4gram_repitition': 0.011561759283645001, 'diversity': 0.40414835573108937}
