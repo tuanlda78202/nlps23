@@ -1,5 +1,5 @@
 # Vietnamese Poem Generator
-| ![Vietnam Reunification Day 30-4-1975](https://github.com/tuanlda78202/nlps23/blob/main/assets/saigon.jpeg) |
+| ![Vietnam Reunification Day 30-4-1975](https://github.com/tuanlda78202/nlps23/blob/main/utils/assets/saigon.jpeg) |
 | :---------------------------------------------------------------------------------------------------------: |
 |                                     Vietnam Reunification Day 30-4-1975                                     |
 
